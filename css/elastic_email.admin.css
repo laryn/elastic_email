@@ -1,0 +1,25 @@
+/* $Id$ */
+
+/**
+ * @file
+ * Styles for the Elastic Email configuration screen.
+ */
+
+input#edit-test-config-button {
+  margin-bottom: 5px;
+  margin-right: 5px;
+}
+
+div#elastic-email-test-wrapper {
+  display: inline-block;
+  padding-left: 2px;
+	
+}
+
+div#elastic-email-test-wrapper .success {
+  color: green;
+}
+
+div#elastic-email-test-wrapper .fail {
+  color: red;
+}

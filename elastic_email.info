@@ -1,0 +1,5 @@
+; $Id$
+name = Elastic Email
+core = 6.x
+package = Mail
+description = Sends Drupal email via the Elastic Email service.
