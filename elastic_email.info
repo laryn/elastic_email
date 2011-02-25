@@ -1,4 +1,3 @@
-; $Id$
 name = Elastic Email
 core = 6.x
 package = Mail
