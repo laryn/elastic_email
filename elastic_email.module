@@ -1,49 +1,23 @@
 <?php
-
-
 /**
  * @file
  * This module directs outbound email to the Elastic Email service.
  * To use this service, you need an Elastic Email account so you can provide a
  * username and API key to this module.
  *
- * This module works by implementing a Drupal SMTP library (smtp_library). That
- * is, the module implements drupal_mail_wrapper(). When the wrapper function
- * is invoked, the message is sent to the Elastic Email service (which is a
- * REST-style API over HTTPS). The wrapper function can also optionally queue
- * messages (using job_queue) for delivery at cron time.
+ * This module allows for the inclusion of ElasticEmail as the native Drupal mail
+ * handler using the new Drupal mail system interface.
  *
  * @see http://elasticemail.com
  */
 
 /**
- * Constant for the Elastic Email username variable/parameter.
- */
-define(ELASTIC_EMAIL_USERNAME, 'elastic_email_username');
-
-/**
- * Constant for the API key variable/parameter.
- */
-define(ELASTIC_EMAIL_API_KEY, 'elastic_email_api_key');
-
-/**
- * Constant for the "is email queued?" variable/parameter.
- */
-define(ELASTIC_EMAIL_QUEUE_ENABLED, 'elastic_email_queue_enabled');
-
-/**
- * Constant for the "are successful transactions logged?" variable/parameter.
- */
-define(ELASTIC_EMAIL_LOG_SUCCESS, 'elastic_email_log_success');
-
-
-
-/**
  * Implements hook_menu().
  */
 function elastic_email_menu() {
+  $items = array();
 
-  $items['admin/settings/elastic_email'] = array(
+  $items['admin/config/system/elastic_email'] = array(
     'title' => 'Elastic Email',
     'description' => 'Configure Elastic Email',
     'page callback' => 'drupal_get_form',
@@ -52,7 +26,7 @@ function elastic_email_menu() {
     'access callback' => 'user_access',
     'access arguments' => array('administer site configuration'));
 
-  $items['admin/settings/elastic_email/test'] = array(
+  $items['admin/config/system/elastic_email/test'] = array(
     'type' => MENU_CALLBACK,
     'page callback' => 'elastic_email_test_config',
     'file' => 'elastic_email.admin.inc',
@@ -61,7 +35,6 @@ function elastic_email_menu() {
 
   return $items;
 }
-
 
 /**
  * Implements hook_help().
@@ -75,14 +48,45 @@ function elastic_email_help($path = '', $arg = '') {
       return '<pre>' . $help . '</pre>';
 
     case 'admin/settings/elastic_email':
-        // Introductory text
+      // Introductory text.
       $help = '<p>'
-        . t('Elastic Email is a (commercial) mail relay service. It is particularly of use as a mail relay for cloud-hosted (e.g. Amazon EC2) websites that may be subject to IP-based spam filtering, or sites that have restrictions on outbound ports.')
+        . t('Elastic Email is a (commercial) mail relay service. It is particularly
+          of use as a mail relay for cloud-hosted (e.g. Amazon EC2) websites that
+          may be subject to IP-based spam filtering, or sites that have restrictions
+          on outbound ports.')
         . '</p><p>'
-        . t('This module intercepts outgoing Drupal mail, and delivers it to the Elastic Email REST-style service over HTTPS. Note that email is delivered as though all recipients are BCC (that is, recipients cannot see other recipients of the message).')
+        . t('This module intercepts outgoing Drupal mail, and delivers it to the
+          Elastic Email REST-style service over HTTPS. Note that email is delivered
+          as though all recipients are BCC (that is, recipients cannot see other
+          recipients of the message).')
         . '</p><p>'
-        . t('To use the service, visit the <a href="http://elasticemail.com">Elastic Email website</a> and sign-up to get an account <em>username</em> and <em>API Key</em>.')
+        . t('To use the service, visit the <a href="http://elasticemail.com">Elastic
+          Email website</a> and sign-up to get an account <em>username</em> and
+          <em>API Key</em>.')
         . '</p>';
       return $help;
   }
+}
+
+/**
+ * Implements hook_cron_queue_info().
+ */
+function elastic_email_cron_queue_info() {
+  $queues = array();
+  $queues['elastic_email'] = array(
+    'worker callback' => 'elastic_email_cron_send',
+    'time' => 5,
+  );
+  return $queues;
+}
+
+/**
+ * Sends the emails that are in the queue.
+ *
+ * @param $message
+ *   The email message string that will be sent.
+ */
+function elastic_email_cron_send($message) {
+  module_load_include('inc', 'elastic_email', 'mail');
+  ElasticEmailMailSystem::cronSend($message);
 }

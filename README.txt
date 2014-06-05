@@ -26,9 +26,9 @@ very prominent reasons to use it:
  - Some servers have restrictions on outgoing ports, i.e. SMTP. Your website may
    simply be unable to use SMTP. Elastic Email uses a REST-style API over HTTPS.
    So, all you need open is port 443, the standard HTTPS port.
-   
+
 But the main reason may be:
- 
+
 - You can be up and running in less than 5 minutes total.
   Really.
   You can even get an account that lets you send 1000 emails before you need to
@@ -66,7 +66,7 @@ containing README.txt.
 
 Then, go to your Drupal module admin screen which you'll find at:
 
-    YOUR_SITE/admin/build/modules
+    YOUR_SITE/admin/modules
 
 Enable the 'elastic_email' module (it's under the 'Mail' category) and click
 'Save configuration'.
@@ -77,7 +77,7 @@ Enable the 'elastic_email' module (it's under the 'Mail' category) and click
 =========================================
 Go to the Elastic Email configuration screen, which is at:
 
-    YOUR_SITE/admin/settings/elastic_email
+    YOUR_SITE/admin/config/system/elastic_email
 
 Then:
  1. Enter your 'Elastic Email username'.
@@ -97,8 +97,7 @@ There are two other options you can set:
    request thread - thus delaying page execution while the message is forwarded
    to the ElasticEmail service - messages are queued and then delivered when
    the cron job runs. This approach is *strongly* recommended for production
-   websites. Note that this option is only available if the job_queue
-   module is installed and enabled. 
+   websites.
  - Log message delivery success: All delivery errors are logged, but if this
    option is checked, then a log message is also generated for successfully
    delivered messages. Logging is via watchdog, so you should be able to view
@@ -116,7 +115,7 @@ There are two other options you can set:
    regardless of whether the recipients are in the To:, CC: or BCC: fields.
    That is, message recipients never see the other recipients.
  - This module works by acting as the 'smtp_library' for Drupal. That is, this
-   module implements drupal_mail_wrapper(). Only one module can provide this
+   module implements DrupalMailSystem. Only one module can provide this
    function, so this module may not be compatible with other mail-related
    modules. Disable these other mail-related modules to use this module.
 
@@ -133,9 +132,6 @@ There are two other options you can set:
 =========================================
  - The author is not affiliated with the providers of the Elastic Email service.
    However, they kept it real simple, and it works. Well done, lads.
- - The message queueing and module install code is based heavily on the
-   queue_mail module by Khalid Baheyeldin of 2bits.com. Cheers Khalid.
- - Thanks to the author of the job_queue module... very handy.
  - Thanks to Dries and the myriad other Drupal contributors for creating what is
    an incredibly powerful and productive piece of sofware.
  - This module was created by Neil O'Toole.
