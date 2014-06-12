@@ -27,6 +27,11 @@ function elastic_email_settings_form() {
   // Get the webmaster's email address... used below.
   $site_mail = variable_get('site_mail', NULL);
 
+  // Emails won't get sent if allow_url_fopen is disabled.
+  if (ini_get('allow_url_fopen') != 1) {
+    drupal_set_message(t("You must enable 'allow_url_fopen' in your php.ini settings to be able to use this service."), 'error');
+  }
+
   // Fieldset to hold credential fields, and Test fieldset.
   $form['credentials'] = array(
     '#type' => 'fieldset',
