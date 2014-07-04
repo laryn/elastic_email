@@ -93,10 +93,7 @@ function elastic_email_settings_form() {
   $form['options'][ELASTIC_EMAIL_QUEUE_ENABLED] = array(
     '#type' => 'checkbox',
     '#title' => t('Queue outgoing messages'),
-    '#description' => t('When checked, outgoing messages will be queued via
-        Drupal core system queue, and delivered when the queue is emptied at cron
-        time. When unchecked, messages are delivered immediately (synchronously).
-        Note that synchronous delivery can cause delay in page execution time.'),
+    '#description' => t('When checked, outgoing messages will be queued via Drupal core system queue, and delivered when the queue is emptied at cron time. When unchecked, messages are delivered immediately (synchronously). Note that synchronous delivery can cause delay in page execution time.'),
     '#default_value' => variable_get(ELASTIC_EMAIL_QUEUE_ENABLED, FALSE));
 
   $form['options'][ELASTIC_EMAIL_LOG_SUCCESS] = array(

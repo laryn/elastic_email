@@ -42,27 +42,19 @@ function elastic_email_menu() {
 function elastic_email_help($path = '', $arg = '') {
 
   switch ($path) {
-    case 'admin/help#elastic_email':
+    case 'admin/help/elastic_email':
       // Return the README inside a <pre> element.
       $help = file_get_contents(dirname(__FILE__) . "/README.txt");
       return '<pre>' . $help . '</pre>';
 
-    case 'admin/settings/elastic_email':
+    case 'admin/config/system/elastic_email':
       // Introductory text.
       $help = '<p>'
-        . t('Elastic Email is a (commercial) mail relay service. It is particularly
-          of use as a mail relay for cloud-hosted (e.g. Amazon EC2) websites that
-          may be subject to IP-based spam filtering, or sites that have restrictions
-          on outbound ports.')
+        . t('Elastic Email is a (commercial) mail relay service. It is particularly of use as a mail relay for cloud-hosted (e.g. Amazon EC2) websites that may be subject to IP-based spam filtering, or sites that have restrictions on outbound ports.')
         . '</p><p>'
-        . t('This module intercepts outgoing Drupal mail, and delivers it to the
-          Elastic Email REST-style service over HTTPS. Note that email is delivered
-          as though all recipients are BCC (that is, recipients cannot see other
-          recipients of the message).')
+        . t('This module intercepts outgoing Drupal mail, and delivers it to the Elastic Email REST-style service over HTTPS. Note that email is delivered as though all recipients are BCC (that is, recipients cannot see other recipients of the message).')
         . '</p><p>'
-        . t('To use the service, visit the <a href="http://elasticemail.com">Elastic
-          Email website</a> and sign-up to get an account <em>username</em> and
-          <em>API Key</em>.')
+        . t('To use the service, visit the <a href="http://elasticemail.com">Elastic Email website</a> and sign-up to get an account <em>username</em> and <em>API Key</em>.')
         . '</p>';
       return $help;
   }
