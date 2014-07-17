@@ -1,16 +1,17 @@
 
+Elastic Email 7.x-x.x, xxxx-xx-xx
+------------------------------
+
+
 Elastic Email 7.x-1.1, xxxx-xx-xx
 ------------------------------
+#995640 by mike.davis: fix for no response (or empty response) received from
+  Elastic Email service.
 #2297777 by mike.davis: Text is not translatable.
-#995640 by mike.davis: fix for no response (or empty response) received from Elastic Email service.
+#2305277 by mike.davis: Update queue description to add link to Queue UI.
 
 
 Elastic Email 7.x-1.0, 2014-06-05
 ==========================================
 
-- Updated to support Drupal 7.x
-
-
-Elastic Email 6.x-1.0, 2010-12-09
-==========================================
-- Initial release.
+Initial release for Drupal 7.x

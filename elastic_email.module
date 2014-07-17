@@ -40,7 +40,6 @@ function elastic_email_menu() {
  * Implements hook_help().
  */
 function elastic_email_help($path = '', $arg = '') {
-
   switch ($path) {
     case 'admin/help/elastic_email':
       // Return the README inside a <pre> element.
