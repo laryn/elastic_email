@@ -99,7 +99,7 @@ function elastic_email_send($message = array()) {
   }
   elseif (variable_get(ELASTIC_EMAIL_LOG_SUCCESS, TRUE)) {
     // If success, only log if the ELASTIC_EMAIL_LOG_SUCCESS variable is TRUE.
-    watchdog('elastic_email', $result['success']['msg'], NULL, WATCHDOG_ERROR);
+    watchdog('elastic_email', $result['success']['msg'], NULL, WATCHDOG_INFO);
   }
 
   return $result['success'] ? TRUE : FALSE;
