@@ -72,6 +72,16 @@ function elastic_email_send($message = array()) {
     // the _elastic_email_send() method.
   }
 
+  // Parse $message['from'] into $from and $from_name if in full RFC format.
+  if (preg_match('~^"?([^"]+)"? <\s*(.+)\s*>$~', $message['from'], $matches)) {
+    $from_name = $matches[1];
+    $from = $matches[2];
+  }
+  else {
+    $from_name = NULL;
+    $from = $message['from'];
+  }
+
   // Array to hold the set of email recipients.
   $recipients = array();
 
@@ -87,8 +97,8 @@ function elastic_email_send($message = array()) {
 
   // Attempt to send the message.
   $result = _elastic_email_send(
-    $message['from'],
-    NULL,
+    $from,
+    $from_name,
     $to,
     $message['subject'],
     $message['body']);
