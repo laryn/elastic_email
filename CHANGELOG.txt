@@ -4,6 +4,7 @@ Elastic Email 6.x-1.1, xxxx-xx-xx
 #995640 by mike.davis: fix for no response (or empty response) received from
   Elastic Email service.
 #2305501 by mike.davis: fix for log success logs as an error
+#2318119 by mike.davis: fix for constants not being defined correctly
 
 
  Elastic Email 6.x-1.0
