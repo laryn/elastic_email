@@ -95,13 +95,19 @@ function elastic_email_send($message = array()) {
     $to = implode('; ', $recipients);
   }
 
+  // Check the header content type to see if email is plain text, if not we
+  // send as HTML.
+  $s_html = (strpos($message['headers']['Content-Type'], 'text/plain') !== FALSE);
+
   // Attempt to send the message.
   $result = _elastic_email_send(
     $from,
     $from_name,
     $to,
     $message['subject'],
-    $message['body']);
+    ($s_html ? NULL : $message['body']),
+    ($s_html ? $message['body'] : NULL)
+  );
 
   if ($result['error']) {
     // If there's an error, log it.
@@ -149,6 +155,8 @@ function elastic_email_send($message = array()) {
  *   The subject line.
  * @param $body_text
  *   The plain-text body of the message.
+ * @param $body_html
+ *   The html-text body of the message.
  * @param $elastic_username
  *   (optional) The Elastic Email account username (typically the account email
  *   address). If not provided, the value from the module configuration is used.
@@ -163,7 +171,7 @@ function elastic_email_send($message = array()) {
  *
  * @todo Perhaps support HTML-based email and attachments?
  */
-function _elastic_email_send($from, $from_name = NULL, $to, $subject = '', $body_text = '', $elastic_username = NULL,  $api_key = NULL) {
+function _elastic_email_send($from, $from_name, $to, $subject = '', $body_text = NULL, $body_html = NULL, $elastic_username = NULL, $api_key = NULL) {
 
   if (!$elastic_username) {
     // If no username provided, get it from the module configuration.
@@ -200,9 +208,12 @@ function _elastic_email_send($from, $from_name = NULL, $to, $subject = '', $body
     $data .= '&to=' . urlencode($to);
     $data .= '&subject=' . urlencode($subject);
 
-    $data .= '&body_text=' . urlencode($body_text);
-    // REVISIT: Need to support HTML at some point.
-    //$data .= '&body_html=' . urlencode('<p><em>' . $body_text . '</em></p>');
+    if (!empty($body_text)) {
+      $data .= '&body_text=' . urlencode($body_text);
+    }
+    if (!empty($body_html)) {
+      $data .= '&body_html=' . urlencode($body_html);
+    }
 
     $ctx = stream_context_create(array('http' => array('method' => 'post', 'content' => $data)));
     $fp = @fopen(ELASTIC_EMAIL_ENDPOINT, 'rb', FALSE, $ctx);
