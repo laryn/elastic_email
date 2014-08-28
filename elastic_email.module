@@ -42,7 +42,6 @@ define('ELASTIC_EMAIL_LOG_SUCCESS', 'elastic_email_log_success');
  * Implements hook_menu().
  */
 function elastic_email_menu() {
-
   $items['admin/settings/elastic_email'] = array(
     'title' => 'Elastic Email',
     'description' => 'Configure Elastic Email',
@@ -67,7 +66,6 @@ function elastic_email_menu() {
  * Implements hook_help().
  */
 function elastic_email_help($path = '', $arg = '') {
-
   switch ($path) {
     case 'admin/help#elastic_email':
       // Return the README inside a <pre> element.

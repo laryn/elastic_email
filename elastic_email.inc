@@ -14,20 +14,19 @@
 /**
  * Constant for the Elastic Email web service endpoint URL.
  */
-define(ELASTIC_EMAIL_ENDPOINT, 'https://api.elasticemail.com/mailer/send');
+define('ELASTIC_EMAIL_ENDPOINT', 'https://api.elasticemail.com/mailer/send');
 
 
 /**
  * Wrapper function to use Elastic Email and (optionally) job queue.
  *
- * @param $message array
+ * @param array $message
  *   A standard Drupal message.
  *
- * @return
- *  A status string.
+ * @return string
+ *   A status string.
  */
 function drupal_mail_wrapper($message) {
-
   $is_queue_enabled = variable_get(ELASTIC_EMAIL_QUEUE_ENABLED, FALSE);
 
   // If queueing is available and enabled, queue the message.
@@ -54,14 +53,13 @@ function drupal_mail_wrapper($message) {
 /**
  * Email sending function, called from job queue, or directly.
  *
- * @param $message
+ * @param array $message
  *   Standard Drupal email message object.
  *
- * @return
+ * @return bool
  *   TRUE if message delivered; FALSE otherwise.
  */
 function elastic_email_send($message = array()) {
-
   // If there's no 'from', then use the default site email.
   if (empty($message['from'])) {
     $from = variable_get('site_mail', NULL);
@@ -123,8 +121,9 @@ function elastic_email_send($message = array()) {
 
 
 /**
- * Performs the actual sending of the message to the Elastic Email service. This
- * code was originally based on the'sendElasticEmail' code snippet from the
+ * Performs the actual sending of the message to the Elastic Email service.
+ *
+ * This code was originally based on the'sendElasticEmail' code snippet from the
  * Elastic Email website.
  *
  * The $elastic_username and $api_key variables are generally not required, as
@@ -145,22 +144,22 @@ function elastic_email_send($message = array()) {
  * message from this module if a pre-condition was not met (e.g. missing
  * required parameters).
  *
- * @param $from
+ * @param string $from
  *   The 'from' (sender) email address.
- * @param $from_name
+ * @param string $from_name
  *   (optional) The name of the sender. Defaults to NULL.
- * @param $to
+ * @param string $to
  *   The semi-colon separated list of recipient email addresses.
- * @param $subject
+ * @param string $subject
  *   The subject line.
- * @param $body_text
+ * @param string $body_text
  *   The plain-text body of the message.
- * @param $body_html
+ * @param string $body_html
  *   The html-text body of the message.
- * @param $elastic_username
+ * @param string $elastic_username
  *   (optional) The Elastic Email account username (typically the account email
  *   address). If not provided, the value from the module configuration is used.
- * @param $api_key
+ * @param string $api_key
  *   (optional) The Elastic Email account API key. If not provided, the value
  *   from the module configuration is used.
  *
@@ -172,7 +171,6 @@ function elastic_email_send($message = array()) {
  * @todo Perhaps support HTML-based email and attachments?
  */
 function _elastic_email_send($from, $from_name, $to, $subject = '', $body_text = NULL, $body_html = NULL, $elastic_username = NULL, $api_key = NULL) {
-
   if (!$elastic_username) {
     // If no username provided, get it from the module configuration.
     $elastic_username = variable_get(ELASTIC_EMAIL_USERNAME, NULL);
@@ -192,7 +190,6 @@ function _elastic_email_send($from, $from_name, $to, $subject = '', $body_text =
 
 
   if (!$result['error']) {
-
     // It's necessary to urlencode() each of the data values.
     $data = 'username=' . urlencode($elastic_username);
     $data .= '&api_key=' . urlencode($api_key);
@@ -244,28 +241,29 @@ function _elastic_email_send($from, $from_name, $to, $subject = '', $body_text =
 
 
 /**
+ * Update the recipients array from a comma-delimited string.
+ *
  * Given a comma-delimted list of email addresses in the $to parameter, parse
  * the addresses and add to the $recipients array.
  *
- * @param $recipients array
+ * @param array $recipients
  *   A passed-by-reference array holding recipient email addresses.
- * @param $to
+ * @param string $to
  *   A comma-delimited list of email addresses.
  */
 function _elastic_email_parse_recipient(&$recipients, $to) {
-
   if (!$to) {
     return;
   }
 
-  // Trim any whitespace
+  // Trim any whitespace.
   $to = trim($to);
 
   if (!empty($to)) {
-    // Explode on comma
+    // Explode on comma.
     $parts = explode(',', $to);
     foreach ($parts as $part) {
-      // Again, trim any whitespace
+      // Again, trim any whitespace.
       $part = trim($part);
       if (!empty($part)) {
         $recipients[] = $part;

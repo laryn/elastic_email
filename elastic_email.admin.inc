@@ -8,21 +8,22 @@
 
 
 /**
- * Form builder for Elastic Email admin settings form. This consists of:
+ * Form builder for Elastic Email admin settings form.
+ *
+ * This consists of:
  * - Elastic Email username field
  * - API key field
  * - Test button (AJAX button for testing username/api key)
  * - Queue messages checkbox
  * - Log success message checkbox
  *
- * @return
+ * @return array
  *   The settings form array.
  *
  * @ingroup forms
  */
 function elastic_email_settings_form() {
-
-  // Add CSS to make the AJAX part of the form look a little better
+  // Add CSS to make the AJAX part of the form look a little better.
   drupal_add_css(drupal_get_path('module', 'elastic_email')
     . "/css/elastic_email.admin.css");
 
@@ -38,7 +39,7 @@ function elastic_email_settings_form() {
     drupal_set_message(t("You must enable 'allow_url_fopen' in your php.ini settings to be able to use this service."), 'error');
   }
 
-  // Fieldset to hold credential fields, and Test fieldset
+  // Fieldset to hold credential fields, and Test fieldset.
   $form['credentials'] = array(
     '#type' => 'fieldset',
     '#title' => t('Credentials'),
@@ -71,7 +72,7 @@ function elastic_email_settings_form() {
       'Attempt to send a test email to <em>!site_mail</em> to verify Elastic Email configuration.',
       array('!site_mail' => $site_mail)));
 
-  // Button for testing the credentials
+  // Button for testing the credentials.
   $form['credentials']['test']['test_config_button'] = array(
     '#type' => 'submit',
     '#value' => t('Test'),
@@ -83,11 +84,11 @@ function elastic_email_settings_form() {
       'method' => 'replace',
       'progress' => array('type' => 'throbber')));
 
-  // DIV to hold the results of the AJAX test call
-  $form['credentials']['test']['test_config_button']['#suffix'] =
-    '<div id="elastic-email-test-wrapper"></div>';
+  // DIV to hold the results of the AJAX test call.
+  $form['credentials']['test']['test_config_button']['#suffix']
+    = '<div id="elastic-email-test-wrapper"></div>';
 
-  // Fieldset for other options
+  // Fieldset for other options.
   $form['options'] = array(
     '#type' => 'fieldset',
     '#title' => t('Options'),
@@ -131,13 +132,13 @@ function elastic_email_settings_form() {
       'When checked, a log message will also be generated for <em>successful</em> email delivery. Errors are always logged.'),
     '#default_value' => variable_get(ELASTIC_EMAIL_LOG_SUCCESS, FALSE));
 
-  // Add the normal settings form stuff
+  // Add the normal settings form stuff.
   $form = system_settings_form($form);
 
   // Get rid of the "Reset to defaults" button, cos we don't like it.
   unset($form['buttons']['reset']);
 
-  // Return the form
+  // Return the form.
   return $form;
 
 }
@@ -150,12 +151,10 @@ function elastic_email_settings_form() {
  * and uses them to send a test message via Elastic Email. The !site_mail
  * email address is used for both sender and recipient of the test mail.
  *
- * @return
- *   HTML 'success' or 'fail' snippet in JSON format
- *
+ * @return string
+ *   HTML 'success' or 'fail' snippet in JSON format.
  */
 function elastic_email_test_config() {
-
   $site_mail = variable_get('site_mail', NULL);
 
   if (!$site_mail) {
