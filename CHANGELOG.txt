@@ -8,6 +8,8 @@ Elastic Email 6.x-1.1, xxxx-xx-xx
 #1068380 by mike.davis, aidanlis: fix for mimemail integration and drupal_mail
   bugfix.
 #1047810 by mike.davis, alexdav: fix for html email not working.
+by mike.davis: fixed coding standard issues and missing constant that wasn't
+  defined correctly
 
 
  Elastic Email 6.x-1.0
