@@ -187,6 +187,7 @@ function elastic_email_test_config() {
         . "\n\n"
         . t('Message generated: !time',
             array('!time' => format_date(time(), 'custom', 'r'))),
+      NULL,
       $username,
       $api_key);
   }
