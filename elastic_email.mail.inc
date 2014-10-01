@@ -232,6 +232,16 @@ class ElasticEmailMailSystem implements MailSystemInterface {
       }
     }
 
+    // Parse $message['from'] into $from and $from_name if in full RFC format.
+    if (preg_match('~^"?([^"]+)"? <\s*(.+)\s*>$~', $message['from'], $matches)) {
+      $from_name = $matches[1];
+      $from = $matches[2];
+    }
+    else {
+      $from_name = NULL;
+      $from = $message['from'];
+    }
+
     // Array to hold the set of email recipients.
     $recipients = array();
 
@@ -254,7 +264,7 @@ class ElasticEmailMailSystem implements MailSystemInterface {
     $s_html = (strpos($message['headers']['Content-Type'], 'text/plain') !== FALSE);
 
     // Attempt to send the message.
-    $result = self::elasticEmailSend($message['from'], NULL, $to, $message['subject'],
+    $result = self::elasticEmailSend($from, $from_name, $to, $message['subject'],
       ($s_html ? NULL : $message['body']), ($s_html ? $message['body'] : NULL));
 
     if (isset($result['error'])) {
@@ -263,7 +273,9 @@ class ElasticEmailMailSystem implements MailSystemInterface {
     }
     if (variable_get(ELASTIC_EMAIL_LOG_SUCCESS, FALSE)) {
       // If success, only log if the ELASTIC_EMAIL_LOG_SUCCESS variable is TRUE.
-      watchdog('elastic_email', 'Email sent successfully: ' . $result['success']['msg'], NULL, WATCHDOG_INFO);
+      if (isset($result['success'])) {
+        watchdog('elastic_email', 'Email sent successfully: ' . $result['success']['msg'], NULL, WATCHDOG_INFO);
+      }
     }
 
     return isset($result['success']) && $result['success'] ? TRUE : FALSE;
