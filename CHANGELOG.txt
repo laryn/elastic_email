@@ -3,7 +3,7 @@ Elastic Email 7.x-x.x, xxxx-xx-xx
 ------------------------------
 
 
-Elastic Email 7.x-1.1, xxxx-xx-xx
+Elastic Email 7.x-1.1, 2014-10-01
 ------------------------------
 #1068380 by mike.davis: Fixed Mimemail integration and drupal_mail bugfix.
 #1047810 by mike.davis: Fixed html email not working.
