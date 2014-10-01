@@ -67,14 +67,28 @@ function elastic_email_settings_form() {
   // Button for testing the credentials.
   $form['credentials']['test']['test_config_button'] = array(
     '#type' => 'submit',
-    '#value' => t('Test'),
+    '#value' => t('Send Test Email (Plain Text)'),
     '#executes_submit_callback' => FALSE,
     '#ajax' => array(
       'callback' => 'elastic_email_test_config',
       'wrapper' => 'elastic-email-test-wrapper',
       'effect' => 'fade',
       'method' => 'replace',
-    ));
+    )
+  );
+
+  // Button for testing the credentials.
+  $form['credentials']['test']['test_html_config_button'] = array(
+    '#type' => 'submit',
+    '#value' => t('Send Test Email (HTML)'),
+    '#executes_submit_callback' => FALSE,
+    '#ajax' => array(
+      'callback' => 'elastic_email_test_html_config',
+      'wrapper' => 'elastic-email-test-wrapper',
+      'effect' => 'fade',
+      'method' => 'replace',
+    )
+  );
 
   // DIV to hold the results of the AJAX test call.
   $form['credentials']['test']['elastic-email-test-wrapper'] = array(
@@ -121,7 +135,7 @@ function elastic_email_settings_form() {
  * @return string
  *   HTML 'success' or 'fail' snippet in JSON format
  */
-function elastic_email_test_config($form, &$form_state) {
+function elastic_email_test_config($form, &$form_state, $is_html = FALSE) {
   $site_mail = variable_get('site_mail', NULL);
 
   if (!$site_mail) {
@@ -144,15 +158,32 @@ function elastic_email_test_config($form, &$form_state) {
   if (!isset($result['error'])) {
     module_load_include('inc', 'elastic_email', 'mail');
 
+    if (!$is_html) {
+      $text_body = t('This is a test of the Drupal Elastic Email module configuration.')
+        . "\n\n"
+        . t('Message generated: !time',
+          array('!time' => format_date(REQUEST_TIME, 'custom', 'r')));
+      $html_body = NULL;
+      $subject = t('Elastic Email module: configuration test email');
+    }
+    else {
+      $text_body = NULL;
+      $html_body = '<html><body><p><strong>' .
+        t('This is a HTML test of the Drupal Elastic Email module configuration.')
+          . '</strong></p><p>'
+          . t('Message generated: !time',
+            array('!time' => format_date(REQUEST_TIME, 'custom', 'r')))
+        . '</p></body></html>';
+      $subject = t('Elastic Email module: configuration HTML test email');
+    }
+
     $result = ElasticEmailMailSystem::elasticEmailSend(
       $site_mail,
       NULL,
       $site_mail,
-      t('Elastic Email module: configuration test email'),
-      t('This is a test of the Drupal Elastic Email module configuration.')
-        . "\n\n"
-        . t('Message generated: !time',
-            array('!time' => format_date(REQUEST_TIME, 'custom', 'r'))),
+      $subject,
+      $text_body,
+      $html_body,
       $username,
       $api_key);
   }
@@ -170,4 +201,18 @@ function elastic_email_test_config($form, &$form_state) {
   $element = $form['credentials']['test']['elastic-email-test-wrapper'];
   $element['#markup'] = $element['#prefix'] . $data . $element['#suffix'];
   return $element;
+}
+
+/**
+ * AJAX callback function to test the sending of HTML email.
+ *
+ * This calls the main test function, but sets the $is_html.
+ *
+ * @see elastic_email_test_config
+ *
+ * @return string
+ *   HTML 'success' or 'fail' snippet in JSON format
+ */
+function elastic_email_test_html_config($form, &$form_state) {
+  return elastic_email_test_config($form, $form_state, TRUE);
 }

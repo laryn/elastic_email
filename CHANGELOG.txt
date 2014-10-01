@@ -5,6 +5,7 @@ Elastic Email 7.x-x.x, xxxx-xx-xx
 
 Elastic Email 7.x-1.1, xxxx-xx-xx
 ------------------------------
+#1047810 by mike.davis: Fixed html email not working.
 #995640 by mike.davis: fix for no response (or empty response) received from
   Elastic Email service.
 #2297777 by mike.davis: Text is not translatable.

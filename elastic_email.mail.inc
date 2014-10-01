@@ -116,6 +116,8 @@ class ElasticEmailMailSystem implements MailSystemInterface {
    *   The subject line.
    * @param string $body_text
    *   The plain-text body of the message.
+   * @param string $body_html
+   *   The html-text body of the message.
    * @param string $elastic_username
    *   (optional) The Elastic Email account username (typically the account email
    *   address). If not provided, the value from the module configuration is used.
@@ -130,7 +132,7 @@ class ElasticEmailMailSystem implements MailSystemInterface {
    *
    * @todo Provide support for HTML-based email and attachments?
    */
-  public static function elasticEmailSend($from, $from_name = NULL, $to, $subject = '', $body_text = '', $elastic_username = NULL, $api_key = NULL) {
+  public static function elasticEmailSend($from, $from_name = NULL, $to, $subject = '', $body_text = NULL, $body_html = NULL, $elastic_username = NULL, $api_key = NULL) {
     if (!$elastic_username) {
       // If no username provided, get it from the module configuration.
       $elastic_username = variable_get(ELASTIC_EMAIL_USERNAME, NULL);
@@ -164,9 +166,12 @@ class ElasticEmailMailSystem implements MailSystemInterface {
       $data .= '&to=' . urlencode($to);
       $data .= '&subject=' . urlencode($subject);
 
-      $data .= '&body_text=' . urlencode($body_text);
-      // @todo: Need to support HTML at some point.
-      // $data .= '&body_html=' . urlencode('<p><em>' . $body_text . '</em></p>');
+      if (!empty($body_text)) {
+        $data .= '&body_text=' . urlencode($body_text);
+      }
+      if (!empty($body_html)) {
+        $data .= '&body_html=' . urlencode($body_html);
+      }
 
       $ctx = stream_context_create(array(
         'http' => array('method' => 'post', 'content' => $data)
@@ -244,8 +249,13 @@ class ElasticEmailMailSystem implements MailSystemInterface {
       $to = implode('; ', $recipients);
     }
 
+    // Check the header content type to see if email is plain text, if not we
+    // send as HTML.
+    $s_html = (strpos($message['headers']['Content-Type'], 'text/plain') !== FALSE);
+
     // Attempt to send the message.
-    $result = self::elasticEmailSend($message['from'], NULL, $to, $message['subject'], $message['body']);
+    $result = self::elasticEmailSend($message['from'], NULL, $to, $message['subject'],
+      ($s_html ? NULL : $message['body']), ($s_html ? $message['body'] : NULL));
 
     if (isset($result['error'])) {
       // If there's an error, log it.
