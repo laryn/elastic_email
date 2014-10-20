@@ -4,30 +4,6 @@
  * Implements elastic email support on behalf of Drupal core.
  */
 
-/**
- * Constant for the Elastic Email web service endpoint URL.
- */
-define('ELASTIC_EMAIL_ENDPOINT', 'https://api.elasticemail.com/mailer/send');
-
-/**
- * Constant for the Elastic Email username variable/parameter.
- */
-define('ELASTIC_EMAIL_USERNAME', 'elastic_email_username');
-
-/**
- * Constant for the API key variable/parameter.
- */
-define('ELASTIC_EMAIL_API_KEY', 'elastic_email_api_key');
-
-/**
- * Constant for the "is email queued?" variable/parameter.
- */
-define('ELASTIC_EMAIL_QUEUE_ENABLED', 'elastic_email_queue_enabled');
-
-/**
- * Constant for the "are successful transactions logged?" variable/parameter.
- */
-define('ELASTIC_EMAIL_LOG_SUCCESS', 'elastic_email_log_success');
 
 /**
  * Modify the drupal mail system to use smtp when sending emails.

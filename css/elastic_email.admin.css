@@ -12,7 +12,6 @@ input#edit-test-config-button {
 div#elastic-email-test-wrapper {
   display: inline-block;
   padding-left: 2px;
-	
 }
 
 div#elastic-email-test-wrapper .success {
@@ -21,4 +20,25 @@ div#elastic-email-test-wrapper .success {
 
 div#elastic-email-test-wrapper .fail {
   color: red;
+}
+
+/* Admin Dashboard */
+.ee-dashboard {
+  padding-top: 20px;
+}
+
+.ee-dashboard-box {
+  float: left;
+  width: 200px;
+  height: 100px;
+  margin-right: 20px;
+  text-align: center;
+  border: 1px solid;
+}
+
+.ee-dashboard-value {
+  display: block;
+  font-size: 24px;
+  font-width: bold !important;
+  padding: 20px;
 }

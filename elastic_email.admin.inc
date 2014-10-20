@@ -5,6 +5,19 @@
  */
 
 /**
+ * Dashboard information.
+ */
+function elastic_email_dashboard() {
+  // Add CSS to make the AJAX part of the form look a little better.
+  $path = drupal_get_path('module', 'elastic_email');
+  drupal_add_css($path . '/css/elastic_email.admin.css');
+
+  $data = ElasticEmailApiAccountDetails::getInstance()->makeRequest(FALSE);
+
+  return theme('elastic_email_dashboard', array('data' => $data));
+}
+
+/**
  * Form builder for Elastic Email admin settings form.
  *
  * This consists of:
@@ -35,17 +48,19 @@ function elastic_email_settings_form() {
   // Fieldset to hold credential fields, and Test fieldset.
   $form['credentials'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Credentials'),
-    '#collapsible' => TRUE,
-    '#collapsed' => FALSE);
+    '#title' => t('API Credentials'),
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE
+  );
 
   $form['credentials'][ELASTIC_EMAIL_USERNAME] = array(
     '#type' => 'textfield',
     '#size' => 48,
-    '#title' => t('Elastic Email username'),
+    '#title' => t('API username'),
     '#required' => TRUE,
     '#default_value' => variable_get(ELASTIC_EMAIL_USERNAME, ''),
-    '#description' => t('This is typically your Elastic Email account email address.'));
+    '#description' => t('This is typically your Elastic Email account email address.')
+  );
 
   $form['credentials'][ELASTIC_EMAIL_API_KEY] = array(
     '#type' => 'textfield',
@@ -53,7 +68,8 @@ function elastic_email_settings_form() {
     '#title' => t('API Key'),
     '#required' => TRUE,
     '#default_value' => variable_get(ELASTIC_EMAIL_API_KEY, ''),
-    '#description' => t('The API Key format is typically <tt>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</tt>.'));
+    '#description' => t('The API Key format is typically <tt>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</tt>.')
+  );
 
   $form['credentials']['test'] = array(
     '#type' => 'fieldset',
@@ -62,7 +78,8 @@ function elastic_email_settings_form() {
     '#collapsed' => FALSE,
     '#attributes' => array('class' => array('credentials-test-fs')),
     '#description' => t('Attempt to send a test email to <em>!site_mail</em> to verify Elastic Email configuration.',
-      array('!site_mail' => $site_mail)));
+      array('!site_mail' => $site_mail))
+  );
 
   // Button for testing the credentials.
   $form['credentials']['test']['test_config_button'] = array(
@@ -101,28 +118,46 @@ function elastic_email_settings_form() {
   $form['options'] = array(
     '#type' => 'fieldset',
     '#title' => t('Options'),
-    '#collapsible' => TRUE,
-    '#collapsed' => FALSE);
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE
+  );
 
   $form['options'][ELASTIC_EMAIL_QUEUE_ENABLED] = array(
     '#type' => 'checkbox',
     '#title' => t('Queue outgoing messages'),
     '#description' => t('When checked, outgoing messages will be queued via Drupal core system queue, and delivered when the queue is emptied at cron time. When unchecked, messages are delivered immediately (synchronously). Note that synchronous delivery can cause delay in page execution time.') .
       '<br /><br />' . t('If enabled, you can use the <a href="@link" target="_blank">Queue UI</a> to view the queue.', array('@link' => 'https://www.drupal.org/project/queue_ui')),
-    '#default_value' => variable_get(ELASTIC_EMAIL_QUEUE_ENABLED, FALSE));
+    '#default_value' => variable_get(ELASTIC_EMAIL_QUEUE_ENABLED, FALSE)
+  );
 
   $form['options'][ELASTIC_EMAIL_LOG_SUCCESS] = array(
     '#type' => 'checkbox',
     '#title' => t('Log message delivery success'),
     '#description' => t('When checked, a log message will also be generated for <em>successful</em> email delivery. Errors are always logged.'),
-    '#default_value' => variable_get(ELASTIC_EMAIL_LOG_SUCCESS, FALSE));
+    '#default_value' => variable_get(ELASTIC_EMAIL_LOG_SUCCESS, FALSE)
+  );
+
+  // Fieldset for other settings.
+  $form['settings'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Settings'),
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE
+  );
+
+  $form['settings']['elastic_email_credit_low_threshold'] = array(
+    '#type' => 'textfield',
+    '#size' => 8,
+    '#title' => t('Low Credit Threshold (USD)'),
+    '#description' => t('Sets the lower threshold limit value of when to warn admin users about a low credit limit.'),
+    '#default_value' => variable_get('elastic_email_credit_low_threshold', 0)
+  );
 
   // Add the normal settings form stuff.
   $form = system_settings_form($form);
 
   // Return the form.
   return $form;
-
 }
 
 /**

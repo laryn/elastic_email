@@ -12,6 +12,31 @@
  */
 
 /**
+ * Constant for the Elastic Email web service endpoint URL.
+ */
+define('ELASTIC_EMAIL_ENDPOINT', 'https://api.elasticemail.com/mailer/send');
+
+/**
+ * Constant for the Elastic Email username variable/parameter.
+ */
+define('ELASTIC_EMAIL_USERNAME', 'elastic_email_username');
+
+/**
+ * Constant for the API key variable/parameter.
+ */
+define('ELASTIC_EMAIL_API_KEY', 'elastic_email_api_key');
+
+/**
+ * Constant for the "is email queued?" variable/parameter.
+ */
+define('ELASTIC_EMAIL_QUEUE_ENABLED', 'elastic_email_queue_enabled');
+
+/**
+ * Constant for the "are successful transactions logged?" variable/parameter.
+ */
+define('ELASTIC_EMAIL_LOG_SUCCESS', 'elastic_email_log_success');
+
+/**
  * Implements hook_menu().
  */
 function elastic_email_menu() {
@@ -19,19 +44,39 @@ function elastic_email_menu() {
 
   $items['admin/config/system/elastic_email'] = array(
     'title' => 'Elastic Email',
+    'description' => 'Elastic Email Dashboard',
+    'page callback' => 'elastic_email_dashboard',
+    'file' => 'elastic_email.admin.inc',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer site configuration')
+  );
+
+  $items['admin/config/system/elastic_email/elastic_email'] = array(
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'title' => 'Elastic Email',
+    'description' => 'Elastic Email Dashboard',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer site configuration')
+  );
+
+  $items['admin/config/system/elastic_email/settings'] = array(
+    'type' => MENU_LOCAL_TASK,
+    'title' => 'Settings',
     'description' => 'Configure Elastic Email',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('elastic_email_settings_form'),
     'file' => 'elastic_email.admin.inc',
     'access callback' => 'user_access',
-    'access arguments' => array('administer site configuration'));
+    'access arguments' => array('administer site configuration')
+  );
 
   $items['admin/config/system/elastic_email/test'] = array(
     'type' => MENU_CALLBACK,
     'page callback' => 'elastic_email_test_config',
     'file' => 'elastic_email.admin.inc',
     'access callback' => 'user_access',
-    'access arguments' => array('administer site configuration'));
+    'access arguments' => array('administer site configuration')
+  );
 
   return $items;
 }
@@ -80,4 +125,30 @@ function elastic_email_cron_queue_info() {
 function elastic_email_cron_send($message) {
   module_load_include('inc', 'elastic_email', 'mail');
   ElasticEmailMailSystem::cronSend($message);
+}
+
+/**
+ * Implements hook_init().
+ */
+function elastic_email_init() {
+  if (user_access('administer site configuration') && path_is_admin(current_path())) {
+    $account_data = ElasticEmailApiAccountDetails::getInstance()->makeRequest();
+    $credit_low_threshold = variable_get('elastic_email_credit_low_threshold', 0);
+    if ($account_data['credit'] <= $credit_low_threshold) {
+      drupal_set_message(t('Your Elastic Email credit is getting low - currently at %credit %currency', array('%credit' => $account_data['credit'], '%currency' => $account_data['currency'])), 'warning');
+    }
+  }
+}
+
+/**
+ *  Implements hook_theme().
+ */
+function elastic_email_theme() {
+  return array(
+    'elastic_email_dashboard' => array(
+      'template' => 'elastic-email-dashboard',
+      'variables' => array('data' => NULL),
+      'path' => drupal_get_path('module', 'elastic_email') . '/theme',
+    ),
+  );
 }

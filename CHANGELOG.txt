@@ -3,6 +3,12 @@ Elastic Email 7.x-x.x, xxxx-xx-xx
 ------------------------------
 
 
+Elastic Email 7.x-2.0-beta1, 2014-10-20
+------------------------------
+#2292607 by mike.davis: Added ability to show how much credit is left on your
+  account.
+
+
 Elastic Email 7.x-1.1, 2014-10-01
 ------------------------------
 #1068380 by mike.davis: Fixed Mimemail integration and drupal_mail bugfix.

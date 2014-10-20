@@ -6,4 +6,6 @@ description = Sends Drupal email via the Elastic Email service.
 configure = admin/config/system/elastic_email
 
 dependencies[] = mailsystem
-files[] = elastic_email.mail.inc
+
+files[] = lib/elastic_email.mail.inc
+files[] = lib/ElasticEmail.inc
