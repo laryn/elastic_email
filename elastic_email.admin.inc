@@ -33,6 +33,8 @@ function elastic_email_dashboard() {
  * @ingroup forms
  */
 function elastic_email_settings_form() {
+  global $base_url;
+
   // Add CSS to make the AJAX part of the form look a little better.
   $path = drupal_get_path('module', 'elastic_email');
   drupal_add_css($path . '/css/elastic_email.admin.css');
@@ -151,6 +153,27 @@ function elastic_email_settings_form() {
     '#title' => t('Low Credit Threshold (USD)'),
     '#description' => t('Sets the lower threshold limit value of when to warn admin users about a low credit limit.'),
     '#default_value' => variable_get('elastic_email_credit_low_threshold', 0)
+  );
+
+  $form['settings']['elastic_email_use_default_channel'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use a Default Channel'),
+    '#description' => t('If no default channel is set, then the default (set by Elastic Email) is the sending email address.<br />Setting a default channel will add this value to every email that is sent, meaning that you can more easily identify email that has come from each specific site within the reporting section.'),
+    '#default_value' => variable_get('elastic_email_use_default_channel', FALSE)
+  );
+
+  $url = parse_url($base_url);
+  $form['settings']['elastic_email_default_channel'] = array(
+    '#type' => 'textfield',
+    '#size' => 48,
+    '#maxlength' => 60,
+    '#title' => t('Default Channel'),
+    '#default_value' => variable_get('elastic_email_default_channel', $url['host']),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="elastic_email_use_default_channel"]' => array('checked' => TRUE),
+      ),
+    ),
   );
 
   // Add the normal settings form stuff.

@@ -149,6 +149,10 @@ class ElasticEmailMailSystem implements MailSystemInterface {
         $data .= '&body_html=' . urlencode($body_html);
       }
 
+      if (variable_get('elastic_email_use_default_channel', FALSE)) {
+        $data .= '&channel=' . variable_get('elastic_email_default_channel', '');
+      }
+
       $ctx = stream_context_create(array(
         'http' => array('method' => 'post', 'content' => $data)
       ));
