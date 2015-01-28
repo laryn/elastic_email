@@ -41,12 +41,12 @@ abstract class ElasticEmailApi {
    *   An instance of an Elastic Email API call.
    */
   public static function getInstance() {
-    if (is_null(self::$instance)) {
-      $class = get_called_class();
-      self::$instance = new $class();
+    $class = get_called_class();
+    if (!isset(self::$instance[$class])) {
+      self::$instance[$class] = new $class();
     }
 
-    return new self::$instance();
+    return new self::$instance[$class]();
   }
 
   /**
@@ -173,15 +173,88 @@ class ElasticEmailApiAccountDetails extends ElasticEmailApi {
    * @throws ElasticEmailException
    */
   protected function processResponse($response) {
-    $account_details = simplexml_load_string($response->data);
-    if (empty($account_details)) {
+    $accountDetails = simplexml_load_string($response->data);
+    if (empty($accountDetails)) {
       throw new ElasticEmailException($response->data);
     }
 
     $data = array();
-    foreach ($account_details->children() as $key => $item) {
+    foreach ($accountDetails->children() as $key => $item) {
       $data[$key] = (string) $item;
     }
+
+    return $data;
+  }
+}
+
+class ElasticEmailApiChannelList extends ElasticEmailApi {
+
+  /**
+   * Constructor.
+   */
+  public function __construct() {
+    $this->setApiCallPath('channel/list');
+  }
+
+  /**
+   * Returns the list of channels from the Elastic Email account.
+   *
+   * @param object $response
+   *   The drupal_http_request object from the call to Elastic Email API.
+   *
+   * @return array
+   *   The list of channels.
+   */
+  protected function processResponse($response) {
+    $channelList = simplexml_load_string($response->data);
+
+    $data = array();
+    foreach ($channelList->children() as $item) {
+      $name = (string) $item->attributes()->name;
+      $data[$name] = $name;
+    }
+
+    return $data;
+  }
+}
+
+class ElasticEmailApiActivityLog extends ElasticEmailApi {
+
+  /**
+   * Constructor.
+   */
+  public function __construct() {
+    $this->setApiCallPath('status/log');
+    $this->setApiParameters('format', 'csv');
+  }
+
+  public function setParams($status, $channel, $from_date, $to_date) {
+    $this->setApiParameters('status', $status);
+    $this->setApiParameters('channel', $channel);
+    $this->setApiParameters('from', $from_date);
+    $this->setApiParameters('to', $to_date);
+  }
+
+  /**
+   * Returns the data about the Elastic Email account.
+   *
+   * @param object $response
+   *   The drupal_http_request object from the call to Elastic Email API.
+   *
+   * @return array
+   *   The account details | error message string.
+   *
+   * @throws ElasticEmailException
+   */
+  protected function processResponse($response) {
+    $lines = explode(PHP_EOL, trim($response->data));
+
+    $data = array();
+    foreach ($lines as $line) {
+      $data[] = str_getcsv($line);
+    }
+    // Remove the header row.
+    array_shift($data);
 
     return $data;
   }

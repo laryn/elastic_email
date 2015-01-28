@@ -9,8 +9,7 @@
  */
 function elastic_email_dashboard() {
   // Add CSS to make the AJAX part of the form look a little better.
-  $path = drupal_get_path('module', 'elastic_email');
-  drupal_add_css($path . '/css/elastic_email.admin.css');
+  _elastic_email_add_admin_css();
 
   $data = ElasticEmailApiAccountDetails::getInstance()->makeRequest(FALSE);
 
@@ -36,8 +35,7 @@ function elastic_email_settings_form() {
   global $base_url;
 
   // Add CSS to make the AJAX part of the form look a little better.
-  $path = drupal_get_path('module', 'elastic_email');
-  drupal_add_css($path . '/css/elastic_email.admin.css');
+  _elastic_email_add_admin_css();
 
   // Get the webmaster's email address... used below.
   $site_mail = variable_get('site_mail', NULL);
@@ -51,8 +49,6 @@ function elastic_email_settings_form() {
   $form['credentials'] = array(
     '#type' => 'fieldset',
     '#title' => t('API Credentials'),
-    '#collapsible' => FALSE,
-    '#collapsed' => FALSE
   );
 
   $form['credentials'][ELASTIC_EMAIL_USERNAME] = array(
@@ -120,8 +116,6 @@ function elastic_email_settings_form() {
   $form['options'] = array(
     '#type' => 'fieldset',
     '#title' => t('Options'),
-    '#collapsible' => FALSE,
-    '#collapsed' => FALSE
   );
 
   $form['options'][ELASTIC_EMAIL_QUEUE_ENABLED] = array(
@@ -143,8 +137,6 @@ function elastic_email_settings_form() {
   $form['settings'] = array(
     '#type' => 'fieldset',
     '#title' => t('Settings'),
-    '#collapsible' => FALSE,
-    '#collapsed' => FALSE
   );
 
   $form['settings']['elastic_email_credit_low_threshold'] = array(
@@ -273,4 +265,185 @@ function elastic_email_test_config($form, &$form_state, $is_html = FALSE) {
  */
 function elastic_email_test_html_config($form, &$form_state) {
   return elastic_email_test_config($form, $form_state, TRUE);
+}
+
+/**
+ * Menu callback for the activity log.
+ */
+function elastic_email_activity_log($form, &$form_state) {
+  global $base_url;
+
+  // Add CSS to make the AJAX part of the form look a little better.
+  _elastic_email_add_admin_css();
+
+  $form['text'] = array(
+    '#markup' => t('The following log information only provides data from the last 30 days. For a full report on your emails, visit the <a href="https://elasticemail.com/account">Elastic Email</a> main dashboard.'),
+  );
+
+  $form['search'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Search Options'),
+    '#attributes' => array(
+      'class' => array(
+        'container-inline',
+        'ee-admin-container',
+      ),
+    ),
+  );
+
+  // @todo set constants for these.
+  $form['search']['status'] = array(
+    '#type' => 'select',
+    '#title' => t('Email Status'),
+    '#options' => array(
+      0 => 'All',
+      1 => 'Ready To Send',
+      2 => 'In Progress',
+      4 => 'Bounced',
+      5 => 'Sent',
+      6 => 'Opened',
+      7 => 'Clicked',
+      8 => 'Unsubscribed',
+      9 => 'Abuse Report',
+    ),
+  );
+
+  // Get the channel list.
+  $channel_list = ElasticEmailApiChannelList::getInstance()->makeRequest();
+  $url = parse_url($base_url);
+
+  $form['search']['channel'] = array(
+    '#type' => 'select',
+    '#title' => t('Select the Channel'),
+    '#options' => $channel_list,
+    '#default_value' => variable_get('elastic_email_default_channel', $url['host'])
+  );
+
+  $date_format = 'd/m/Y h:i A';
+  $from_value = format_date(REQUEST_TIME - (60 * 60 * 24 * 30), 'custom', 'Y-m-d H:i:s');
+  $to_value = format_date(REQUEST_TIME + (60 * 60 * 0.25), 'custom', 'Y-m-d H:i:s');
+
+  $form['search']['date_from'] = array(
+    '#type' => 'date_select',
+    '#title' => t('Date From'),
+    '#default_value' => $from_value,
+    '#date_format' => $date_format,
+    '#date_label_position' => 'within',
+    '#date_timezone' => 'Europe/London',
+    '#date_increment' => 15,
+    '#date_year_range' => '0:0',
+  );
+
+  $form['search']['date_to'] = array(
+    '#type' => 'date_select',
+    '#title' => t('Date To'),
+    '#default_value' => $to_value,
+    '#date_format' => $date_format,
+    '#date_label_position' => 'within',
+    '#date_timezone' => 'Europe/London',
+    '#date_increment' => 15,
+    '#date_year_range' => '0:0',
+  );
+
+  $form['search']['apply'] = array(
+    '#type' => 'button',
+    '#value' => t('Apply'),
+    '#ajax' => array(
+      'callback' => 'elastic_email_activity_log_table',
+      'wrapper' => 'elastic-email-activity-log-results',
+      'method' => 'replace',
+    ),
+  );
+
+  $form['results'] = array(
+    '#type' => 'markup',
+    '#prefix' => '<div class="ee-activity-log">',
+    '#suffix' => '</div>'
+  );
+
+  $form['results']['wrapper'] = array(
+    '#type' => 'markup',
+    '#prefix' => '<div id="elastic-email-activity-log-results">',
+    '#suffix' => '</div>'
+  );
+
+  return $form;
+}
+
+/**
+ * AJAX callback function for the activity log results.
+ */
+function elastic_email_activity_log_table($form, &$form_state) {
+  $output = '';
+
+  $status = $form_state['input']['status'];
+  $channel = $form_state['input']['channel'];
+  $from_date_field = $form_state['input']['date_from'];
+  $to_date_field = $form_state['input']['date_to'];
+
+  $from_date = _elastic_email_format_date($from_date_field);
+  $to_date = _elastic_email_format_date($to_date_field);
+
+  $activity_log = ElasticEmailApiActivityLog::getInstance();
+  $activity_log->setParams($status, $channel, $from_date, $to_date);
+  $data = $activity_log->makeRequest(FALSE);
+
+  if (count($data) < 1) {
+    $data[] = array(
+      array(
+        'data' => 'No records available.',
+        'colspan' => 5,
+      )
+    );
+  }
+
+  $activity_list = array();
+  foreach ($data as $row) {
+    // Remove message, bounce cat., msg-id, trans-id.
+    unset($row[4], $row[5], $row[6], $row[7]);
+    $activity_list[] = $row;
+  }
+
+  $table_data['header'] = array(
+    'to',
+    'status',
+    'channel',
+    'date',
+    /*'message',
+    'bounce cat.',
+    'msg-id',
+    'trans-id',*/
+    'subject'
+  );
+  $table_data['rows'] = $activity_list;
+
+  $output .= theme('table', $table_data);
+
+  $element = $form['results']['wrapper'];
+  $element['#markup'] = $output;
+  return $element;
+}
+
+/**
+ * Helper function which adds the admin css file to the page.
+ */
+function _elastic_email_add_admin_css() {
+  $path = drupal_get_path('module', 'elastic_email');
+  drupal_add_css($path . '/css/elastic_email.admin.css');
+}
+
+/**
+ * Helper function to format a UK format date to American format.
+ *
+ * @param array $date_field
+ *   The date field array.
+ *
+ * @return string
+ *   The formatted date.
+ */
+function _elastic_email_format_date($date_field) {
+  $data = sprintf('%d/%d/%d', $date_field['month'], $date_field['day'], $date_field['year']);
+  $time = sprintf('%s:%s %s', $date_field['hour'], $date_field['minute'], $date_field['ampm']);
+
+  return $data . ' ' . $time;
 }

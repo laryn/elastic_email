@@ -48,7 +48,8 @@ function elastic_email_menu() {
     'page callback' => 'elastic_email_dashboard',
     'file' => 'elastic_email.admin.inc',
     'access callback' => 'user_access',
-    'access arguments' => array('administer site configuration')
+    'access arguments' => array('administer site configuration'),
+    'weight' => 0,
   );
 
   $items['admin/config/system/elastic_email/elastic_email'] = array(
@@ -56,7 +57,19 @@ function elastic_email_menu() {
     'title' => 'Elastic Email',
     'description' => 'Elastic Email Dashboard',
     'access callback' => 'user_access',
-    'access arguments' => array('administer site configuration')
+    'access arguments' => array('administer site configuration'),
+  );
+
+  $items['admin/config/system/elastic_email/activity_log'] = array(
+    'type' => MENU_LOCAL_TASK,
+    'title' => 'Activity Log',
+    'description' => 'View the Elastic Email activity log',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('elastic_email_activity_log'),
+    'file' => 'elastic_email.admin.inc',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer site configuration'),
+    'weight' => 1,
   );
 
   $items['admin/config/system/elastic_email/settings'] = array(
@@ -67,7 +80,8 @@ function elastic_email_menu() {
     'page arguments' => array('elastic_email_settings_form'),
     'file' => 'elastic_email.admin.inc',
     'access callback' => 'user_access',
-    'access arguments' => array('administer site configuration')
+    'access arguments' => array('administer site configuration'),
+    'weight' => 10,
   );
 
   $items['admin/config/system/elastic_email/test'] = array(
