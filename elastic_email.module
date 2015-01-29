@@ -149,7 +149,12 @@ function elastic_email_init() {
     $account_data = ElasticEmailApiAccountDetails::getInstance()->makeRequest();
     $credit_low_threshold = variable_get('elastic_email_credit_low_threshold', 0);
     if ($account_data['credit'] <= $credit_low_threshold) {
-      drupal_set_message(t('Your Elastic Email credit is getting low - currently at %credit %currency', array('%credit' => $account_data['credit'], '%currency' => $account_data['currency'])), 'warning');
+      drupal_set_message(t('Your Elastic Email credit is getting low - currently at %credit %currency',
+        array(
+          '%credit' => $account_data['credit'],
+          '%currency' => $account_data['currency']
+        )),
+        'warning', FALSE);
     }
   }
 }
