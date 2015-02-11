@@ -3,7 +3,7 @@ Elastic Email 7.x-x.x, xxxx-xx-xx
 ------------------------------
 
 
-Elastic Email 7.x-2.0-x, xxxx-xx-xx
+Elastic Email 7.x-2.0-rc1, 2015-02-11
 ------------------------------
 #2359643 by mike.davis: Provide ability to customise the test emails.
 
