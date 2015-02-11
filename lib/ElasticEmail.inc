@@ -62,6 +62,10 @@ abstract class ElasticEmailApi {
       throw new ElasticEmailException('No API call has been specified');
     }
 
+    if (!$this->hasValidApiKeys()) {
+      throw new ElasticEmailException('Invalid API credentials for: ' . $this->apiCallPath);
+    }
+
     // Return the cached data if there is any.
     $cacheKey = 'elastic_email_api_call::' . $this->apiCallPath;
     $cachedApiCallResponse = cache_get($cacheKey, 'cache');
@@ -71,7 +75,7 @@ abstract class ElasticEmailApi {
     }
     else {
       // Make the API request.
-      $url = $this->apiUrl . $this->apiCallPath . '?' . $this->getApiParameters();
+      $url = $this->apiUrl . $this->apiCallPath . '?' . $this->getApiFormattedParameters();
       $response = drupal_http_request($url);
 
       // Cache lifetime - 5 minutes.
@@ -81,6 +85,7 @@ abstract class ElasticEmailApi {
       cache_set($cacheKey, $response, 'cache', $expiryTime);
     }
 
+    $this->validateResponse($response);
     return $this->processResponse($response);
   }
 
@@ -91,6 +96,20 @@ abstract class ElasticEmailApi {
    *   The drupal_http_request object from the call to Elastic Email API.
    */
   abstract protected function processResponse($response);
+
+  /**
+   * Validates the response from the API.
+   *
+   * @param stdClass $response
+   *   The response object from the drupal_http_request call.
+   *
+   * @throws ElasticEmailException
+   */
+  protected function validateResponse($response) {
+    if (substr($response->data, 0, strlen('Unauthorized:')) == 'Unauthorized:') {
+      throw new ElasticEmailException('Elastic Email: Invalid API credentials set.');
+    }
+  }
 
   /**
    * Sets the API call path.
@@ -115,7 +134,7 @@ abstract class ElasticEmailApi {
    */
   protected function setApiAuthUsername() {
     $username = variable_get(ELASTIC_EMAIL_USERNAME, NULL);
-    $this->setApiParameters('username', $username);
+    $this->setApiParameter('username', $username);
   }
 
   /**
@@ -123,7 +142,25 @@ abstract class ElasticEmailApi {
    */
   protected function setApiAuthApiKey() {
     $api_key = variable_get(ELASTIC_EMAIL_API_KEY, NULL);
-    $this->setApiParameters('api_key', $api_key);
+    $this->setApiParameter('api_key', $api_key);
+  }
+
+  /**
+   * Checks to see if the API keys have been set.
+   *
+   * @return bool
+   *   If the API keys are valid.
+   */
+  protected function hasValidApiKeys() {
+    $username = $this->getApiParameter('username');
+    $api_key  = $this->getApiParameter('api_key');
+    if (is_null($username) || $username == '') {
+      return FALSE;
+    }
+    if (is_null($api_key) || $api_key == '') {
+      return FALSE;
+    }
+    return TRUE;
   }
 
   /**
@@ -134,8 +171,21 @@ abstract class ElasticEmailApi {
    * @param string $value
    *   The value of the API parameter.
    */
-  protected function setApiParameters($key, $value) {
+  protected function setApiParameter($key, $value) {
     $this->apiParameters[$key] = $value;
+  }
+
+  /**
+   * Gets the API parameter.
+   *
+   * @param string $key
+   *   The key for the API parameter.
+   *
+   * @return mixed
+   *   The value of the parameter.
+   */
+  protected function getApiParameter($key) {
+    return $this->apiParameters[$key];
   }
 
   /**
@@ -144,7 +194,7 @@ abstract class ElasticEmailApi {
    * @return string
    *   The API parameters as a URL string.
    */
-  protected function getApiParameters() {
+  protected function getApiFormattedParameters() {
     return http_build_query($this->apiParameters);
   }
 }
@@ -225,14 +275,14 @@ class ElasticEmailApiActivityLog extends ElasticEmailApi {
    */
   public function __construct() {
     $this->setApiCallPath('status/log');
-    $this->setApiParameters('format', 'csv');
+    $this->setApiParameter('format', 'csv');
   }
 
   public function setParams($status, $channel, $from_date, $to_date) {
-    $this->setApiParameters('status', $status);
-    $this->setApiParameters('channel', $channel);
-    $this->setApiParameters('from', $from_date);
-    $this->setApiParameters('to', $to_date);
+    $this->setApiParameter('status', $status);
+    $this->setApiParameter('channel', $channel);
+    $this->setApiParameter('from', $from_date);
+    $this->setApiParameter('to', $to_date);
   }
 
   /**
