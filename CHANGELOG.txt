@@ -5,12 +5,12 @@ Elastic Email 7.x-x.x, xxxx-xx-xx
 
 Elastic Email 7.x-2.0-x, xxxx-xx-xx
 ------------------------------
-
+#2359643 by mike.davis: Provide ability to customise the test emails.
 
 
 Elastic Email 7.x-2.0-beta2, 2015-01-28
 ------------------------------
-#2292605: Provide ability to view the log
+#2292605 by mike.davis: Provide ability to view the log
 
 
 Elastic Email 7.x-2.0-beta1, 2014-10-20

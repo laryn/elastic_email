@@ -85,11 +85,15 @@ function elastic_email_menu() {
   );
 
   $items['admin/config/system/elastic_email/test'] = array(
-    'type' => MENU_CALLBACK,
-    'page callback' => 'elastic_email_test_config',
+    'type' => MENU_LOCAL_TASK,
+    'title' => 'Test Email',
+    'description' => 'Send test email via Elastic Email',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('elastic_email_send_test'),
     'file' => 'elastic_email.admin.inc',
     'access callback' => 'user_access',
-    'access arguments' => array('administer site configuration')
+    'access arguments' => array('administer site configuration'),
+    'weight' => 11,
   );
 
   return $items;
@@ -146,15 +150,19 @@ function elastic_email_cron_send($message) {
  */
 function elastic_email_init() {
   if (user_access('administer site configuration') && path_is_admin(current_path())) {
-    $account_data = ElasticEmailApiAccountDetails::getInstance()->makeRequest();
-    $credit_low_threshold = variable_get('elastic_email_credit_low_threshold', 0);
-    if ($account_data['credit'] <= $credit_low_threshold) {
-      drupal_set_message(t('Your Elastic Email credit is getting low - currently at %credit %currency',
-        array(
-          '%credit' => $account_data['credit'],
-          '%currency' => $account_data['currency']
-        )),
-        'warning', FALSE);
+    try {
+      $account_data = ElasticEmailApiAccountDetails::getInstance()->makeRequest();
+      $credit_low_threshold = variable_get('elastic_email_credit_low_threshold', 0);
+      if ($account_data['credit'] <= $credit_low_threshold) {
+        drupal_set_message(t('Your Elastic Email credit is getting low - currently at %credit %currency',
+          array(
+            '%credit' => $account_data['credit'],
+            '%currency' => $account_data['currency']
+          )),
+          'warning', FALSE);
+      }
+    }
+    catch (ElasticEmailException $e) {
     }
   }
 }

@@ -11,9 +11,19 @@ function elastic_email_dashboard() {
   // Add CSS to make the AJAX part of the form look a little better.
   _elastic_email_add_admin_css();
 
-  $data = ElasticEmailApiAccountDetails::getInstance()->makeRequest(FALSE);
+  if (!_elastic_email_has_valid_settings()) {
+    drupal_set_message(t('You need to configure your Elastic Email settings.'), 'error');
+  }
 
-  return theme('elastic_email_dashboard', array('data' => $data));
+  try {
+    $data = ElasticEmailApiAccountDetails::getInstance()->makeRequest(FALSE);
+    return theme('elastic_email_dashboard', array('data' => $data));
+  }
+  catch (ElasticEmailException $e) {
+    drupal_set_message($e->getMessage(), 'error');
+  }
+
+  return '';
 }
 
 /**
@@ -36,9 +46,6 @@ function elastic_email_settings_form() {
 
   // Add CSS to make the AJAX part of the form look a little better.
   _elastic_email_add_admin_css();
-
-  // Get the webmaster's email address... used below.
-  $site_mail = variable_get('site_mail', NULL);
 
   // Emails won't get sent if allow_url_fopen is disabled.
   if (ini_get('allow_url_fopen') != 1) {
@@ -67,42 +74,6 @@ function elastic_email_settings_form() {
     '#required' => TRUE,
     '#default_value' => variable_get(ELASTIC_EMAIL_API_KEY, ''),
     '#description' => t('The API Key format is typically <tt>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</tt>.')
-  );
-
-  $form['credentials']['test'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Test'),
-    '#collapsible' => FALSE,
-    '#collapsed' => FALSE,
-    '#attributes' => array('class' => array('credentials-test-fs')),
-    '#description' => t('Attempt to send a test email to <em>!site_mail</em> to verify Elastic Email configuration.',
-      array('!site_mail' => $site_mail))
-  );
-
-  // Button for testing the credentials.
-  $form['credentials']['test']['test_config_button'] = array(
-    '#type' => 'submit',
-    '#value' => t('Send Test Email (Plain Text)'),
-    '#executes_submit_callback' => FALSE,
-    '#ajax' => array(
-      'callback' => 'elastic_email_test_config',
-      'wrapper' => 'elastic-email-test-wrapper',
-      'effect' => 'fade',
-      'method' => 'replace',
-    )
-  );
-
-  // Button for testing the credentials.
-  $form['credentials']['test']['test_html_config_button'] = array(
-    '#type' => 'submit',
-    '#value' => t('Send Test Email (HTML)'),
-    '#executes_submit_callback' => FALSE,
-    '#ajax' => array(
-      'callback' => 'elastic_email_test_html_config',
-      'wrapper' => 'elastic-email-test-wrapper',
-      'effect' => 'fade',
-      'method' => 'replace',
-    )
   );
 
   // DIV to hold the results of the AJAX test call.
@@ -176,101 +147,14 @@ function elastic_email_settings_form() {
 }
 
 /**
- * AJAX callback function to test Elastic Email service.
- *
- * This method extracts the username and API key parameters from the POST data,
- * and uses them to send a test message via Elastic Email. The !site_mail
- * email address is used for both sender and recipient of the test mail.
- *
- * @return string
- *   HTML 'success' or 'fail' snippet in JSON format
- */
-function elastic_email_test_config($form, &$form_state, $is_html = FALSE) {
-  $site_mail = variable_get('site_mail', NULL);
-
-  if (!$site_mail) {
-    $result['error'] = t('Unable to send test email because the site e-mail address is not set. This can be specified on the <a href="@site-settings-url">Site information</a> page.',
-      array('@site-settings-url' => url('admin/settings/site-information')));
-  }
-
-  $username = check_plain($_POST[ELASTIC_EMAIL_USERNAME]);
-  $api_key  = check_plain($_POST[ELASTIC_EMAIL_API_KEY]);
-  $result   = array();
-
-  if (empty($api_key)) {
-    $result['error'] = t('You must supply an Elastic Email API key.');
-  }
-
-  if (empty($username)) {
-    $result['error'] = t('You must supply an Elastic Email username.');
-  }
-
-  if (!isset($result['error'])) {
-    module_load_include('inc', 'elastic_email', 'mail');
-
-    if (!$is_html) {
-      $text_body = t('This is a test of the Drupal Elastic Email module configuration.')
-        . "\n\n"
-        . t('Message generated: !time',
-          array('!time' => format_date(REQUEST_TIME, 'custom', 'r')));
-      $html_body = NULL;
-      $subject = t('Elastic Email module: configuration test email');
-    }
-    else {
-      $text_body = NULL;
-      $html_body = '<html><body><p><strong>' .
-        t('This is a HTML test of the Drupal Elastic Email module configuration.')
-          . '</strong></p><p>'
-          . t('Message generated: !time',
-            array('!time' => format_date(REQUEST_TIME, 'custom', 'r')))
-        . '</p></body></html>';
-      $subject = t('Elastic Email module: configuration HTML test email');
-    }
-
-    $result = ElasticEmailMailSystem::elasticEmailSend(
-      $site_mail,
-      NULL,
-      $site_mail,
-      $subject,
-      $text_body,
-      $html_body,
-      $username,
-      $api_key);
-  }
-
-  if (isset($result['error'])) {
-    // There was an error. Return error HTML.
-    $data = '<strong class="fail">' . t('Failed.') . '</strong> '
-      . t('Reason:') . ' <tt>' . $result['error'] . '</tt>';
-  }
-  else {
-    // Success!
-    $data = '<strong class="success">' . t('Success.') . '</strong>';
-  }
-
-  $element = $form['credentials']['test']['elastic-email-test-wrapper'];
-  $element['#markup'] = $element['#prefix'] . $data . $element['#suffix'];
-  return $element;
-}
-
-/**
- * AJAX callback function to test the sending of HTML email.
- *
- * This calls the main test function, but sets the $is_html.
- *
- * @see elastic_email_test_config
- *
- * @return string
- *   HTML 'success' or 'fail' snippet in JSON format
- */
-function elastic_email_test_html_config($form, &$form_state) {
-  return elastic_email_test_config($form, $form_state, TRUE);
-}
-
-/**
  * Menu callback for the activity log.
  */
 function elastic_email_activity_log($form, &$form_state) {
+  if (!_elastic_email_has_valid_settings()) {
+    drupal_set_message(t('You need to configure your Elastic Email settings.'), 'error');
+    return $form;
+  }
+
   global $base_url;
 
   // Add CSS to make the AJAX part of the form look a little better.
@@ -308,8 +192,15 @@ function elastic_email_activity_log($form, &$form_state) {
     ),
   );
 
-  // Get the channel list.
-  $channel_list = ElasticEmailApiChannelList::getInstance()->makeRequest();
+  try {
+    // Get the channel list.
+    $channel_list = ElasticEmailApiChannelList::getInstance()->makeRequest();
+  }
+  catch (ElasticEmailException $e) {
+    drupal_set_message($e->getMessage(), 'error');
+    return array();
+  }
+
   $url = parse_url($base_url);
 
   $form['search']['channel'] = array(
@@ -384,9 +275,15 @@ function elastic_email_activity_log_table($form, &$form_state) {
   $from_date = _elastic_email_format_date($from_date_field);
   $to_date = _elastic_email_format_date($to_date_field);
 
-  $activity_log = ElasticEmailApiActivityLog::getInstance();
-  $activity_log->setParams($status, $channel, $from_date, $to_date);
-  $data = $activity_log->makeRequest(FALSE);
+  try {
+    $activity_log = ElasticEmailApiActivityLog::getInstance();
+    $activity_log->setParams($status, $channel, $from_date, $to_date);
+    $data = $activity_log->makeRequest(FALSE);
+  }
+  catch (ElasticEmailException $e) {
+    drupal_set_message($e->getMessage(), 'error');
+    return array();
+  }
 
   if (count($data) < 1) {
     $data[] = array(
@@ -422,6 +319,131 @@ function elastic_email_activity_log_table($form, &$form_state) {
   $element = $form['results']['wrapper'];
   $element['#markup'] = $output;
   return $element;
+}
+
+function _elastic_email_has_valid_settings() {
+  $site_mail = variable_get('site_mail', NULL);
+  $username = variable_get(ELASTIC_EMAIL_USERNAME, NULL);
+  $api_key  = variable_get(ELASTIC_EMAIL_API_KEY, NULL);
+
+  if (is_null($site_mail) || $site_mail == '') {
+    return FALSE;
+  }
+  if (is_null($username) || $username == '') {
+    return FALSE;
+  }
+  if (is_null($api_key) || $api_key == '') {
+    return FALSE;
+  }
+  return TRUE;
+}
+
+/**
+ * Menu callback for sending test email.
+ */
+function elastic_email_send_test($form, &$form_state) {
+  $site_mail = variable_get('site_mail', NULL);
+
+  if (!_elastic_email_has_valid_settings()) {
+    drupal_set_message(t('You need to configure your Elastic Email settings.'), 'error');
+    return $form;
+  }
+
+  $form['elastic_email_test_email_to'] = array(
+    '#type' => 'textfield',
+    '#size' => 40,
+    '#title' => t('Email address to send a test email to'),
+    '#description' => t('Enter the email address that you would like to send a test email to.'),
+    '#required' => TRUE,
+    '#default_value' => $site_mail,
+  );
+
+  $form['elastic_email_test_email_subject'] = array(
+    '#type' => 'textfield',
+    '#size' => 100,
+    '#title' => t('Test Email Subject'),
+    '#description' => t('Enter the subject that you would like to send with the test email.'),
+    '#required' => TRUE,
+    '#default_value' => t('Elastic Email module: configuration test email'),
+  );
+
+  $text_body = t('This is a test of the Drupal Elastic Email module configuration.')
+          . "\n\n"
+          . t('Message generated: !time',
+            array('!time' => format_date(REQUEST_TIME, 'custom', 'r')));
+
+  $form['elastic_email_test_email_body'] = array(
+    '#type' => 'textarea',
+    //'#size' => 8,
+    '#title' => t('Test email body contents'),
+    '#description' => t('Enter the email body that you would like to send.'),
+    '#default_value' => $text_body,
+  );
+
+  $form['elastic_email_test_email_html'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Send as HTML?'),
+    '#description' => t('Check this to send a test email as HTML.'),
+    '#default_value' => FALSE,
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Submit',
+  );
+
+  return $form;
+}
+
+/**
+ * Submit form handler for the test email form.
+ */
+function elastic_email_send_test_submit($form, &$form_state) {
+  $site_mail = variable_get('site_mail', NULL);
+  $username = variable_get(ELASTIC_EMAIL_USERNAME, '');
+  $api_key  = variable_get(ELASTIC_EMAIL_API_KEY, '');
+
+  $to = $form_state['values']['elastic_email_test_email_to'];
+  $subject = $form_state['values']['elastic_email_test_email_subject'];
+
+  if ($form_state['values']['elastic_email_test_email_html']) {
+    $text_body = NULL;
+    $html_body = $form_state['values']['elastic_email_test_email_body'];
+  }
+  else {
+    $text_body = $form_state['values']['elastic_email_test_email_body'];
+    $html_body = NULL;
+  }
+
+  $result = ElasticEmailMailSystem::elasticEmailSend(
+    $site_mail,
+    NULL,
+    $to,
+    $subject,
+    $text_body,
+    $html_body,
+    $username,
+    $api_key
+  );
+
+
+  if (isset($result['error'])) {
+    // There was an error. Return error HTML.
+    drupal_set_message(t('Failed to send a test email to %test_to. Got the following error: %error_msg',
+      array(
+        '%test_to' => $to,
+        '%error_msg' => $result['error'],
+      )
+    ), 'error');
+  }
+  else {
+    // Success!
+    drupal_set_message(t('Successfully sent a test email to %test_to',
+      array(
+        '%test_to' => $to,
+      )
+    ));
+  }
 }
 
 /**
