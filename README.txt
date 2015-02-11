@@ -123,7 +123,7 @@ There are two other options you can set:
 
  Known issues
 =========================================
- - Only supports plain text messages. That is, no HTML or attachments.
+ - Does not support sending with attachments.
  - Hasn't been tested with non-ASCII text.
 
 
@@ -133,6 +133,4 @@ There are two other options you can set:
  - The author is not affiliated with the providers of the Elastic Email service.
    However, they kept it real simple, and it works. Well done, lads.
  - Thanks to Dries and the myriad other Drupal contributors for creating what is
-   an incredibly powerful and productive piece of sofware.
- - This module was created by Neil O'Toole.
-   Contact: http://neilja.net or neilotoole@apache.org
+   an incredibly powerful and productive piece of software.
