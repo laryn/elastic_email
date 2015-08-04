@@ -106,6 +106,10 @@ abstract class ElasticEmailApi {
    * @throws ElasticEmailException
    */
   protected function validateResponse($response) {
+    if (empty($response->data) && isset($response->error)) {
+      drupal_set_message('Elastic Email error: ' . $response->error, 'warning');
+      throw new ElasticEmailException('Elastic Email error: ' . $response->error);
+    }
     if (substr($response->data, 0, strlen('Unauthorized:')) == 'Unauthorized:') {
       throw new ElasticEmailException('Elastic Email: Invalid API credentials set.');
     }

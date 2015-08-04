@@ -3,6 +3,11 @@ Elastic Email 7.x-x.x, xxxx-xx-xx
 ------------------------------
 
 
+Elastic Email 7.x-2.0-rc2, xxxx-xx-xx
+------------------------------
+Issue #2545102 by mike.davis: Undefined property: stdClass::$data error when no connection
+
+
 Elastic Email 7.x-2.0-rc1, 2015-02-11
 ------------------------------
 #2359643 by mike.davis: Provide ability to customise the test emails.
