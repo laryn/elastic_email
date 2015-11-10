@@ -1,0 +1,10 @@
+elastic_email.settings:
+  type: mapping
+  label: Settings
+  mapping:
+    elastic_email_credit_low_threshold:
+      type: integer
+    elastic_email_use_default_channel:
+      type: boolean
+    elastic_email_default_channel:
+      type: string

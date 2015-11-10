@@ -1,0 +1,28 @@
+elastic_email.dashboard:
+  path: /admin/config/system/elastic_email
+  defaults:
+    _title: 'Elastic Email'
+    _controller: '\Drupal\elastic_email\Controller\DefaultController::elastic_email_dashboard'
+  requirements:
+    _permission: 'administer site configuration'
+elastic_email.activity_log:
+  path: /admin/config/system/elastic_email/activity_log
+  defaults:
+    _title: 'Activity Log'
+    _form: \Drupal\elastic_email\Form\ElasticEmailActivityLog
+  requirements:
+    _permission: 'administer site configuration'
+elastic_email.settings_form:
+  path: /admin/config/system/elastic_email/settings
+  defaults:
+    _title: Settings
+    _form: \Drupal\elastic_email\Form\ElasticEmailSettingsForm
+  requirements:
+    _permission: 'administer site configuration'
+elastic_email.send_test:
+  path: /admin/config/system/elastic_email/test
+  defaults:
+    _title: 'Test Email'
+    _form: \Drupal\elastic_email\Form\ElasticEmailSendTest
+  requirements:
+    _permission: 'administer site configuration'

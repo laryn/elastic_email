@@ -17,7 +17,16 @@ function elastic_email_dashboard() {
 
   try {
     $data = ElasticEmailApiAccountDetails::getInstance()->makeRequest(FALSE);
-    return theme('elastic_email_dashboard', array('data' => $data));
+    // @FIXME
+// theme() has been renamed to _theme() and should NEVER be called directly.
+// Calling _theme() directly can alter the expected output and potentially
+// introduce security issues (see https://www.drupal.org/node/2195739). You
+// should use renderable arrays instead.
+// 
+// 
+// @see https://www.drupal.org/node/2195739
+// return theme('elastic_email_dashboard', array('data' => $data));
+
   }
   catch (ElasticEmailException $e) {
     drupal_set_message($e->getMessage(), 'error');
@@ -58,23 +67,33 @@ function elastic_email_settings_form() {
     '#title' => t('API Credentials'),
   );
 
-  $form['credentials'][ELASTIC_EMAIL_USERNAME] = array(
-    '#type' => 'textfield',
-    '#size' => 48,
-    '#title' => t('API username'),
-    '#required' => TRUE,
-    '#default_value' => variable_get(ELASTIC_EMAIL_USERNAME, ''),
-    '#description' => t('This is typically your Elastic Email account email address.')
-  );
+  // @FIXME
+// // @FIXME
+// // The correct configuration object could not be determined. You'll need to
+// // rewrite this call manually.
+// $form['credentials'][ELASTIC_EMAIL_USERNAME] = array(
+//     '#type' => 'textfield',
+//     '#size' => 48,
+//     '#title' => t('API username'),
+//     '#required' => TRUE,
+//     '#default_value' => variable_get(ELASTIC_EMAIL_USERNAME, ''),
+//     '#description' => t('This is typically your Elastic Email account email address.')
+//   );
 
-  $form['credentials'][ELASTIC_EMAIL_API_KEY] = array(
-    '#type' => 'textfield',
-    '#size' => 48,
-    '#title' => t('API Key'),
-    '#required' => TRUE,
-    '#default_value' => variable_get(ELASTIC_EMAIL_API_KEY, ''),
-    '#description' => t('The API Key format is typically <tt>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</tt>.')
-  );
+
+  // @FIXME
+// // @FIXME
+// // The correct configuration object could not be determined. You'll need to
+// // rewrite this call manually.
+// $form['credentials'][ELASTIC_EMAIL_API_KEY] = array(
+//     '#type' => 'textfield',
+//     '#size' => 48,
+//     '#title' => t('API Key'),
+//     '#required' => TRUE,
+//     '#default_value' => variable_get(ELASTIC_EMAIL_API_KEY, ''),
+//     '#description' => t('The API Key format is typically <tt>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</tt>.')
+//   );
+
 
   // DIV to hold the results of the AJAX test call.
   $form['credentials']['test']['elastic-email-test-wrapper'] = array(
@@ -89,20 +108,30 @@ function elastic_email_settings_form() {
     '#title' => t('Options'),
   );
 
-  $form['options'][ELASTIC_EMAIL_QUEUE_ENABLED] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Queue outgoing messages'),
-    '#description' => t('When checked, outgoing messages will be queued via Drupal core system queue, and delivered when the queue is emptied at cron time. When unchecked, messages are delivered immediately (synchronously). Note that synchronous delivery can cause delay in page execution time.') .
-      '<br /><br />' . t('If enabled, you can use the <a href="@link" target="_blank">Queue UI</a> to view the queue.', array('@link' => 'https://www.drupal.org/project/queue_ui')),
-    '#default_value' => variable_get(ELASTIC_EMAIL_QUEUE_ENABLED, FALSE)
-  );
+  // @FIXME
+// // @FIXME
+// // The correct configuration object could not be determined. You'll need to
+// // rewrite this call manually.
+// $form['options'][ELASTIC_EMAIL_QUEUE_ENABLED] = array(
+//     '#type' => 'checkbox',
+//     '#title' => t('Queue outgoing messages'),
+//     '#description' => t('When checked, outgoing messages will be queued via Drupal core system queue, and delivered when the queue is emptied at cron time. When unchecked, messages are delivered immediately (synchronously). Note that synchronous delivery can cause delay in page execution time.') .
+//       '<br /><br />' . t('If enabled, you can use the <a href="@link" target="_blank">Queue UI</a> to view the queue.', array('@link' => 'https://www.drupal.org/project/queue_ui')),
+//     '#default_value' => variable_get(ELASTIC_EMAIL_QUEUE_ENABLED, FALSE)
+//   );
 
-  $form['options'][ELASTIC_EMAIL_LOG_SUCCESS] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Log message delivery success'),
-    '#description' => t('When checked, a log message will also be generated for <em>successful</em> email delivery. Errors are always logged.'),
-    '#default_value' => variable_get(ELASTIC_EMAIL_LOG_SUCCESS, FALSE)
-  );
+
+  // @FIXME
+// // @FIXME
+// // The correct configuration object could not be determined. You'll need to
+// // rewrite this call manually.
+// $form['options'][ELASTIC_EMAIL_LOG_SUCCESS] = array(
+//     '#type' => 'checkbox',
+//     '#title' => t('Log message delivery success'),
+//     '#description' => t('When checked, a log message will also be generated for <em>successful</em> email delivery. Errors are always logged.'),
+//     '#default_value' => variable_get(ELASTIC_EMAIL_LOG_SUCCESS, FALSE)
+//   );
+
 
   // Fieldset for other settings.
   $form['settings'] = array(
@@ -115,23 +144,27 @@ function elastic_email_settings_form() {
     '#size' => 8,
     '#title' => t('Low Credit Threshold (USD)'),
     '#description' => t('Sets the lower threshold limit value of when to warn admin users about a low credit limit.'),
-    '#default_value' => variable_get('elastic_email_credit_low_threshold', 0)
+    '#default_value' => \Drupal::config('elastic_email.settings')->get('elastic_email_credit_low_threshold')
   );
 
   $form['settings']['elastic_email_use_default_channel'] = array(
     '#type' => 'checkbox',
     '#title' => t('Use a Default Channel'),
     '#description' => t('If no default channel is set, then the default (set by Elastic Email) is the sending email address.<br />Setting a default channel will add this value to every email that is sent, meaning that you can more easily identify email that has come from each specific site within the reporting section.'),
-    '#default_value' => variable_get('elastic_email_use_default_channel', FALSE)
+    '#default_value' => \Drupal::config('elastic_email.settings')->get('elastic_email_use_default_channel')
   );
 
   $url = parse_url($base_url);
-  $form['settings']['elastic_email_default_channel'] = array(
+  // @FIXME
+// Could not extract the default value because it is either indeterminate, or
+// not scalar. You'll need to provide a default value in
+// config/install/elastic_email.settings.yml and config/schema/elastic_email.schema.yml.
+$form['settings']['elastic_email_default_channel'] = array(
     '#type' => 'textfield',
     '#size' => 48,
     '#maxlength' => 60,
     '#title' => t('Default Channel'),
-    '#default_value' => variable_get('elastic_email_default_channel', $url['host']),
+    '#default_value' => \Drupal::config('elastic_email.settings')->get('elastic_email_default_channel'),
     '#states' => array(
       'visible' => array(
         ':input[name="elastic_email_use_default_channel"]' => array('checked' => TRUE),
@@ -203,11 +236,15 @@ function elastic_email_activity_log($form, &$form_state) {
 
   $url = parse_url($base_url);
 
-  $form['search']['channel'] = array(
+  // @FIXME
+// Could not extract the default value because it is either indeterminate, or
+// not scalar. You'll need to provide a default value in
+// config/install/elastic_email.settings.yml and config/schema/elastic_email.schema.yml.
+$form['search']['channel'] = array(
     '#type' => 'select',
     '#title' => t('Select the Channel'),
     '#options' => $channel_list,
-    '#default_value' => variable_get('elastic_email_default_channel', $url['host'])
+    '#default_value' => \Drupal::config('elastic_email.settings')->get('elastic_email_default_channel')
   );
 
   $date_format = 'd/m/Y h:i A';
@@ -314,7 +351,16 @@ function elastic_email_activity_log_table($form, &$form_state) {
   );
   $table_data['rows'] = $activity_list;
 
-  $output .= theme('table', $table_data);
+  // @FIXME
+// theme() has been renamed to _theme() and should NEVER be called directly.
+// Calling _theme() directly can alter the expected output and potentially
+// introduce security issues (see https://www.drupal.org/node/2195739). You
+// should use renderable arrays instead.
+// 
+// 
+// @see https://www.drupal.org/node/2195739
+// $output .= theme('table', $table_data);
+
 
   $element = $form['results']['wrapper'];
   $element['#markup'] = $output;
@@ -322,9 +368,24 @@ function elastic_email_activity_log_table($form, &$form_state) {
 }
 
 function _elastic_email_has_valid_settings() {
-  $site_mail = variable_get('site_mail', NULL);
-  $username = variable_get(ELASTIC_EMAIL_USERNAME, NULL);
-  $api_key  = variable_get(ELASTIC_EMAIL_API_KEY, NULL);
+  // @FIXME
+// // @FIXME
+// // This looks like another module's variable. You'll need to rewrite this call
+// // to ensure that it uses the correct configuration object.
+// $site_mail = variable_get('site_mail', NULL);
+
+  // @FIXME
+// // @FIXME
+// // The correct configuration object could not be determined. You'll need to
+// // rewrite this call manually.
+// $username = variable_get(ELASTIC_EMAIL_USERNAME, NULL);
+
+  // @FIXME
+// // @FIXME
+// // The correct configuration object could not be determined. You'll need to
+// // rewrite this call manually.
+// $api_key  = variable_get(ELASTIC_EMAIL_API_KEY, NULL);
+
 
   if (is_null($site_mail) || $site_mail == '') {
     return FALSE;
@@ -342,7 +403,12 @@ function _elastic_email_has_valid_settings() {
  * Menu callback for sending test email.
  */
 function elastic_email_send_test($form, &$form_state) {
-  $site_mail = variable_get('site_mail', NULL);
+  // @FIXME
+// // @FIXME
+// // This looks like another module's variable. You'll need to rewrite this call
+// // to ensure that it uses the correct configuration object.
+// $site_mail = variable_get('site_mail', NULL);
+
 
   if (!_elastic_email_has_valid_settings()) {
     drupal_set_message(t('You need to configure your Elastic Email settings.'), 'error');
@@ -399,9 +465,24 @@ function elastic_email_send_test($form, &$form_state) {
  * Submit form handler for the test email form.
  */
 function elastic_email_send_test_submit($form, &$form_state) {
-  $site_mail = variable_get('site_mail', NULL);
-  $username = variable_get(ELASTIC_EMAIL_USERNAME, '');
-  $api_key  = variable_get(ELASTIC_EMAIL_API_KEY, '');
+  // @FIXME
+// // @FIXME
+// // This looks like another module's variable. You'll need to rewrite this call
+// // to ensure that it uses the correct configuration object.
+// $site_mail = variable_get('site_mail', NULL);
+
+  // @FIXME
+// // @FIXME
+// // The correct configuration object could not be determined. You'll need to
+// // rewrite this call manually.
+// $username = variable_get(ELASTIC_EMAIL_USERNAME, '');
+
+  // @FIXME
+// // @FIXME
+// // The correct configuration object could not be determined. You'll need to
+// // rewrite this call manually.
+// $api_key  = variable_get(ELASTIC_EMAIL_API_KEY, '');
+
 
   $to = $form_state['values']['elastic_email_test_email_to'];
   $subject = $form_state['values']['elastic_email_test_email_subject'];
@@ -451,7 +532,15 @@ function elastic_email_send_test_submit($form, &$form_state) {
  */
 function _elastic_email_add_admin_css() {
   $path = drupal_get_path('module', 'elastic_email');
-  drupal_add_css($path . '/css/elastic_email.admin.css');
+  // @FIXME
+// The Assets API has totally changed. CSS, JavaScript, and libraries are now
+// attached directly to render arrays using the #attached property.
+// 
+// 
+// @see https://www.drupal.org/node/2169605
+// @see https://www.drupal.org/node/2408597
+// drupal_add_css($path . '/css/elastic_email.admin.css');
+
 }
 
 /**

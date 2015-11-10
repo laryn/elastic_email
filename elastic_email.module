@@ -149,10 +149,10 @@ function elastic_email_cron_send($message) {
  * Implements hook_init().
  */
 function elastic_email_init() {
-  if (user_access('administer site configuration') && path_is_admin(current_path())) {
+  if (\Drupal::currentUser()->hasPermission('administer site configuration') && path_is_admin(\Drupal\Core\Url::fromRoute("<current>")->toString())) {
     try {
       $account_data = ElasticEmailApiAccountDetails::getInstance()->makeRequest();
-      $credit_low_threshold = variable_get('elastic_email_credit_low_threshold', 0);
+      $credit_low_threshold = \Drupal::config('elastic_email.settings')->get('elastic_email_credit_low_threshold');
       if ($account_data['credit'] <= $credit_low_threshold) {
         drupal_set_message(t('Your Elastic Email credit is getting low - currently at %credit %currency',
           array(

@@ -1,0 +1,3 @@
+elastic_email_credit_low_threshold: 0
+elastic_email_use_default_channel: false
+elastic_email_default_channel: ''

@@ -1,9 +1,5 @@
 <?php
-/**
- * @file
- * Implements elastic email support on behalf of Drupal core.
- */
-
+namespace Drupal\elastic_email;
 
 /**
  * Modify the drupal mail system to use smtp when sending emails.
@@ -40,7 +36,12 @@ class ElasticEmailMailSystem implements MailSystemInterface {
    *   TRUE if the mail was successfully accepted, otherwise FALSE.
    */
   public function mail(array $message) {
-    $is_queue_enabled = variable_get(ELASTIC_EMAIL_QUEUE_ENABLED, FALSE);
+    // @FIXME
+// // @FIXME
+// // The correct configuration object could not be determined. You'll need to
+// // rewrite this call manually.
+// $is_queue_enabled = variable_get(ELASTIC_EMAIL_QUEUE_ENABLED, FALSE);
+
 
     // If queueing is available and enabled, queue the message.
     if ($is_queue_enabled) {
@@ -48,7 +49,7 @@ class ElasticEmailMailSystem implements MailSystemInterface {
       $queue->createItem($message);
       $queue->createQueue();
 
-      watchdog('elastic_email_queue', 'Message added to the Queue - no. of messages: ' . $queue->numberOfItems(), NULL, WATCHDOG_INFO);
+      \Drupal::logger('elastic_email_queue')->info('Message added to the Queue - no. of messages: ' . $queue->numberOfItems(), []);
 
       return t('Email message queued for delivery via Elastic Email at cron time.');
     }
@@ -111,12 +112,22 @@ class ElasticEmailMailSystem implements MailSystemInterface {
   public static function elasticEmailSend($from, $from_name = NULL, $to, $subject = '', $body_text = NULL, $body_html = NULL, $elastic_username = NULL, $api_key = NULL) {
     if (!$elastic_username) {
       // If no username provided, get it from the module configuration.
-      $elastic_username = variable_get(ELASTIC_EMAIL_USERNAME, NULL);
+      // @FIXME
+// // @FIXME
+// // The correct configuration object could not be determined. You'll need to
+// // rewrite this call manually.
+// $elastic_username = variable_get(ELASTIC_EMAIL_USERNAME, NULL);
+
     }
 
     if (!$api_key) {
       // If no API Key provided, get it from the module configuration.
-      $api_key = variable_get(ELASTIC_EMAIL_API_KEY, NULL);
+      // @FIXME
+// // @FIXME
+// // The correct configuration object could not be determined. You'll need to
+// // rewrite this call manually.
+// $api_key = variable_get(ELASTIC_EMAIL_API_KEY, NULL);
+
     }
     $result = array();
 
@@ -149,8 +160,8 @@ class ElasticEmailMailSystem implements MailSystemInterface {
         $data .= '&body_html=' . urlencode($body_html);
       }
 
-      if (variable_get('elastic_email_use_default_channel', FALSE)) {
-        $data .= '&channel=' . variable_get('elastic_email_default_channel', '');
+      if (\Drupal::config('elastic_email.settings')->get('elastic_email_use_default_channel')) {
+        $data .= '&channel=' . \Drupal::config('elastic_email.settings')->get('elastic_email_default_channel');
       }
 
       $ctx = stream_context_create(array(
@@ -159,7 +170,7 @@ class ElasticEmailMailSystem implements MailSystemInterface {
       $fp = @fopen(ELASTIC_EMAIL_ENDPOINT, 'rb', FALSE, $ctx);
 
       // The response should be safe, but call check_plain() for paranoia's sake.
-      $response = check_plain(@stream_get_contents($fp));
+      $response = \Drupal\Component\Utility\SafeMarkup::checkPlain(@stream_get_contents($fp));
 
       if (empty($response)) {
         $result['error'] = t('Error: no response (or empty response) received from Elastic Email service.');
@@ -206,7 +217,12 @@ class ElasticEmailMailSystem implements MailSystemInterface {
   protected function send($message = array()) {
     // If there's no 'from', then use the default site email.
     if (empty($message['from'])) {
-      $from = variable_get('site_mail', NULL);
+      // @FIXME
+// // @FIXME
+// // This looks like another module's variable. You'll need to rewrite this call
+// // to ensure that it uses the correct configuration object.
+// $from = variable_get('site_mail', NULL);
+
       if (!empty($from)) {
         $message['from'] = $from;
       }
@@ -249,14 +265,19 @@ class ElasticEmailMailSystem implements MailSystemInterface {
 
     if (isset($result['error'])) {
       // If there's an error, log it.
-      watchdog('elastic_email', 'Failed to send email.  Reason: ' . $result['error'], NULL, WATCHDOG_CRITICAL);
+      \Drupal::logger('elastic_email')->critical('Failed to send email.  Reason: ' . $result['error'], []);
     }
-    if (variable_get(ELASTIC_EMAIL_LOG_SUCCESS, FALSE)) {
-      // If success, only log if the ELASTIC_EMAIL_LOG_SUCCESS variable is TRUE.
-      if (isset($result['success'])) {
-        watchdog('elastic_email', 'Email sent successfully: ' . $result['success']['msg'], NULL, WATCHDOG_INFO);
-      }
-    }
+    // @FIXME
+// // @FIXME
+// // The correct configuration object could not be determined. You'll need to
+// // rewrite this call manually.
+// if (variable_get(ELASTIC_EMAIL_LOG_SUCCESS, FALSE)) {
+//       // If success, only log if the ELASTIC_EMAIL_LOG_SUCCESS variable is TRUE.
+//       if (isset($result['success'])) {
+//         watchdog('elastic_email', 'Email sent successfully: ' . $result['success']['msg'], NULL, WATCHDOG_INFO);
+//       }
+//     }
+
 
     return isset($result['success']) && $result['success'] ? TRUE : FALSE;
   }

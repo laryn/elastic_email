@@ -9,14 +9,14 @@
  */
 function elastic_email_install() {
   // Ensure translations don't break at install time.
-  $t = get_t();
+  $t = 't';
 
   // Provide a helpful link to the user at install time.
-  $config_link = l($t('Administer > Configuration > System > Elastic Email'),
-    'admin/config/system/elastic_email');
+  // @FIXME
+// l() expects a Url object, created from a route name or external URI.
+// $config_link = l($t('Administer > Configuration > System > Elastic Email'), 'admin/config/system/elastic_email');
 
-  $help_link = l($t('Administer > Help > Elastic Email'),
-    'admin/help/elastic_email');
+  $help_link = \Drupal::l($t('Administer > Help > Elastic Email'), \Drupal\Core\Url::fromRoute('help.page'));
 
   drupal_set_message($t('Elastic Email settings are available at @config, and online help is available at @help.',
     array('@config' => $config_link, '@help' => $help_link)
@@ -27,14 +27,14 @@ function elastic_email_install() {
  * Implements hook_enable().
  */
 function elastic_email_enable() {
-  mailsystem_set(array('default-system' => 'ElasticEmailMailSystem'));
+  //mailsystem_set(array('default-system' => 'ElasticEmailMailSystem'));
 }
 
 /**
  * Implements hook_disable().
  */
 function elastic_email_disable() {
-  mailsystem_clear(array('default-system' => 'ElasticEmailMailSystem'));
+  //mailsystem_clear(array('default-system' => 'ElasticEmailMailSystem'));
 }
 
 /**
@@ -42,8 +42,28 @@ function elastic_email_disable() {
  */
 function elastic_email_uninstall() {
   // Remove the variables we've set.
-  variable_del(ELASTIC_EMAIL_USERNAME);
-  variable_del(ELASTIC_EMAIL_API_KEY);
-  variable_del(ELASTIC_EMAIL_QUEUE_ENABLED);
-  variable_del(ELASTIC_EMAIL_LOG_SUCCESS);
+  // @FIXME
+// // @FIXME
+// // The correct configuration object could not be determined. You'll need to
+// // rewrite this call manually.
+// variable_del(ELASTIC_EMAIL_USERNAME);
+
+  // @FIXME
+// // @FIXME
+// // The correct configuration object could not be determined. You'll need to
+// // rewrite this call manually.
+// variable_del(ELASTIC_EMAIL_API_KEY);
+
+  // @FIXME
+// // @FIXME
+// // The correct configuration object could not be determined. You'll need to
+// // rewrite this call manually.
+// variable_del(ELASTIC_EMAIL_QUEUE_ENABLED);
+
+  // @FIXME
+// // @FIXME
+// // The correct configuration object could not be determined. You'll need to
+// // rewrite this call manually.
+// variable_del(ELASTIC_EMAIL_LOG_SUCCESS);
+
 }

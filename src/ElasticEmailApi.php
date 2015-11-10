@@ -1,13 +1,5 @@
 <?php
-/**
- * @file
- * Elastic Email API class.
- */
-
-/**
- * Class for handling exceptions.
- */
-class ElasticEmailException extends Exception {}
+namespace Drupal\elastic_email;
 
 /**
  * Abstract Class for connection to the Elastic Email API.
@@ -68,7 +60,7 @@ abstract class ElasticEmailApi {
 
     // Return the cached data if there is any.
     $cacheKey = 'elastic_email_api_call::' . $this->apiCallPath;
-    $cachedApiCallResponse = cache_get($cacheKey, 'cache');
+    $cachedApiCallResponse = \Drupal::cache('cache')->get($cacheKey);
     if ($cached && $cachedApiCallResponse && (REQUEST_TIME < $cachedApiCallResponse->expire)) {
       // Get the cached response for the API call.
       $response =  $cachedApiCallResponse->data;
@@ -76,13 +68,21 @@ abstract class ElasticEmailApi {
     else {
       // Make the API request.
       $url = $this->apiUrl . $this->apiCallPath . '?' . $this->getApiFormattedParameters();
-      $response = drupal_http_request($url);
+      // @FIXME
+// drupal_http_request() has been replaced by the Guzzle HTTP client, which is bundled
+// with Drupal core.
+// 
+// 
+// @see https://www.drupal.org/node/1862446
+// @see http://docs.guzzlephp.org/en/latest
+// $response = drupal_http_request($url);
+
 
       // Cache lifetime - 5 minutes.
       $expiryTime = REQUEST_TIME + (60 * 5);
 
       // Save the data in cache.
-      cache_set($cacheKey, $response, 'cache', $expiryTime);
+      \Drupal::cache('cache')->set($cacheKey, $response, $expiryTime);
     }
 
     $this->validateResponse($response);
@@ -137,7 +137,12 @@ abstract class ElasticEmailApi {
    * Sets the Elastic Email username parameter for the API call.
    */
   protected function setApiAuthUsername() {
-    $username = variable_get(ELASTIC_EMAIL_USERNAME, NULL);
+    // @FIXME
+// // @FIXME
+// // The correct configuration object could not be determined. You'll need to
+// // rewrite this call manually.
+// $username = variable_get(ELASTIC_EMAIL_USERNAME, NULL);
+
     $this->setApiParameter('username', $username);
   }
 
@@ -145,7 +150,12 @@ abstract class ElasticEmailApi {
    * Sets the Elastic Email username parameter for the API call.
    */
   protected function setApiAuthApiKey() {
-    $api_key = variable_get(ELASTIC_EMAIL_API_KEY, NULL);
+    // @FIXME
+// // @FIXME
+// // The correct configuration object could not be determined. You'll need to
+// // rewrite this call manually.
+// $api_key = variable_get(ELASTIC_EMAIL_API_KEY, NULL);
+
     $this->setApiParameter('api_key', $api_key);
   }
 
@@ -200,116 +210,5 @@ abstract class ElasticEmailApi {
    */
   protected function getApiFormattedParameters() {
     return http_build_query($this->apiParameters);
-  }
-}
-
-/**
- * Class for handing the account-details API call.
- */
-class ElasticEmailApiAccountDetails extends ElasticEmailApi {
-
-  /**
-   * Constructor.
-   */
-  public function __construct() {
-    $this->setApiCallPath('account-details');
-  }
-
-  /**
-   * Returns the data about the Elastic Email account.
-   *
-   * @param object $response
-   *   The drupal_http_request object from the call to Elastic Email API.
-   *
-   * @return array
-   *   The account details | error message string.
-   *
-   * @throws ElasticEmailException
-   */
-  protected function processResponse($response) {
-    $accountDetails = simplexml_load_string($response->data);
-    if (empty($accountDetails)) {
-      throw new ElasticEmailException($response->data);
-    }
-
-    $data = array();
-    foreach ($accountDetails->children() as $key => $item) {
-      $data[$key] = (string) $item;
-    }
-
-    return $data;
-  }
-}
-
-class ElasticEmailApiChannelList extends ElasticEmailApi {
-
-  /**
-   * Constructor.
-   */
-  public function __construct() {
-    $this->setApiCallPath('channel/list');
-  }
-
-  /**
-   * Returns the list of channels from the Elastic Email account.
-   *
-   * @param object $response
-   *   The drupal_http_request object from the call to Elastic Email API.
-   *
-   * @return array
-   *   The list of channels.
-   */
-  protected function processResponse($response) {
-    $channelList = simplexml_load_string($response->data);
-
-    $data = array();
-    foreach ($channelList->children() as $item) {
-      $name = (string) $item->attributes()->name;
-      $data[$name] = $name;
-    }
-
-    return $data;
-  }
-}
-
-class ElasticEmailApiActivityLog extends ElasticEmailApi {
-
-  /**
-   * Constructor.
-   */
-  public function __construct() {
-    $this->setApiCallPath('status/log');
-    $this->setApiParameter('format', 'csv');
-  }
-
-  public function setParams($status, $channel, $from_date, $to_date) {
-    $this->setApiParameter('status', $status);
-    $this->setApiParameter('channel', $channel);
-    $this->setApiParameter('from', $from_date);
-    $this->setApiParameter('to', $to_date);
-  }
-
-  /**
-   * Returns the data about the Elastic Email account.
-   *
-   * @param object $response
-   *   The drupal_http_request object from the call to Elastic Email API.
-   *
-   * @return array
-   *   The account details | error message string.
-   *
-   * @throws ElasticEmailException
-   */
-  protected function processResponse($response) {
-    $lines = explode(PHP_EOL, trim($response->data));
-
-    $data = array();
-    foreach ($lines as $line) {
-      $data[] = str_getcsv($line);
-    }
-    // Remove the header row.
-    array_shift($data);
-
-    return $data;
   }
 }
