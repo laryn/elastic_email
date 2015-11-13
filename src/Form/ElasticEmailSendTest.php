@@ -20,18 +20,17 @@ class ElasticEmailSendTest extends FormBase {
     return 'elastic_email_send_test';
   }
 
+  /**
+   * @param array $form
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *
+   * @return array
+   */
   public function buildForm(array $form, \Drupal\Core\Form\FormStateInterface $form_state) {
-    // @FIXME
-// // @FIXME
-// // This looks like another module's variable. You'll need to rewrite this call
-// // to ensure that it uses the correct configuration object.
-// $site_mail = variable_get('site_mail', NULL);
-
-
-    if (!_elastic_email_has_valid_settings()) {
+    /*if (!_elastic_email_has_valid_settings()) {
       drupal_set_message(t('You need to configure your Elastic Email settings.'), 'error');
       return $form;
-    }
+    }*/
 
     $form['elastic_email_test_email_to'] = [
       '#type' => 'textfield',
@@ -39,7 +38,7 @@ class ElasticEmailSendTest extends FormBase {
       '#title' => t('Email address to send a test email to'),
       '#description' => t('Enter the email address that you would like to send a test email to.'),
       '#required' => TRUE,
-      '#default_value' => $site_mail,
+      '#default_value' => \Drupal::config('system.site')->get('mail'),
     ];
 
     $form['elastic_email_test_email_subject'] = [
@@ -57,8 +56,7 @@ class ElasticEmailSendTest extends FormBase {
 
     $form['elastic_email_test_email_body'] = [
       '#type' => 'textarea',
-      //'#size' => 8,
-    '#title' => t('Test email body contents'),
+      '#title' => t('Test email body contents'),
       '#description' => t('Enter the email body that you would like to send.'),
       '#default_value' => $text_body,
     ];
@@ -78,25 +76,14 @@ class ElasticEmailSendTest extends FormBase {
     return $form;
   }
 
+  /**
+   * @param array $form
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   */
   public function submitForm(array &$form, \Drupal\Core\Form\FormStateInterface $form_state) {
-    // @FIXME
-// // @FIXME
-// // This looks like another module's variable. You'll need to rewrite this call
-// // to ensure that it uses the correct configuration object.
-// $site_mail = variable_get('site_mail', NULL);
-
-    // @FIXME
-// // @FIXME
-// // The correct configuration object could not be determined. You'll need to
-// // rewrite this call manually.
-// $username = variable_get(ELASTIC_EMAIL_USERNAME, '');
-
-    // @FIXME
-// // @FIXME
-// // The correct configuration object could not be determined. You'll need to
-// // rewrite this call manually.
-// $api_key  = variable_get(ELASTIC_EMAIL_API_KEY, '');
-
+    $site_mail = \Drupal::config('system.site')->get('mail');
+    $username = \Drupal::config('elastic_email.settings')->get('username');
+    $api_key  = \Drupal::config('elastic_email.settings')->get('api_key');
 
     $to = $form_state->getValue(['elastic_email_test_email_to']);
     $subject = $form_state->getValue(['elastic_email_test_email_subject']);
@@ -111,7 +98,6 @@ class ElasticEmailSendTest extends FormBase {
     }
 
     $result = ElasticEmailMailSystem::elasticEmailSend($site_mail, NULL, $to, $subject, $text_body, $html_body, $username, $api_key);
-
 
     if (isset($result['error'])) {
       // There was an error. Return error HTML.
