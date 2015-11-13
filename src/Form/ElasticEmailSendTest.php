@@ -51,7 +51,7 @@ class ElasticEmailSendTest extends FormBase {
     ];
 
     $text_body = t('This is a test of the Drupal Elastic Email module configuration.') . "\n\n" . t('Message generated: !time', [
-      '!time' => format_date(REQUEST_TIME, 'custom', 'r')
+      '!time' => \Drupal::service('date.formatter')->format(REQUEST_TIME, 'custom', 'r')
       ]);
 
     $form['elastic_email_test_email_body'] = [
