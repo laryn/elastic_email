@@ -71,8 +71,8 @@ abstract class ElasticEmailApi {
       // @FIXME
 // drupal_http_request() has been replaced by the Guzzle HTTP client, which is bundled
 // with Drupal core.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/1862446
 // @see http://docs.guzzlephp.org/en/latest
 // $response = drupal_http_request($url);
@@ -137,12 +137,7 @@ abstract class ElasticEmailApi {
    * Sets the Elastic Email username parameter for the API call.
    */
   protected function setApiAuthUsername() {
-    // @FIXME
-// // @FIXME
-// // The correct configuration object could not be determined. You'll need to
-// // rewrite this call manually.
-// $username = variable_get(ELASTIC_EMAIL_USERNAME, NULL);
-
+    $username = \Drupal::config('elastic_email.settings')->get('username');
     $this->setApiParameter('username', $username);
   }
 
@@ -150,12 +145,7 @@ abstract class ElasticEmailApi {
    * Sets the Elastic Email username parameter for the API call.
    */
   protected function setApiAuthApiKey() {
-    // @FIXME
-// // @FIXME
-// // The correct configuration object could not be determined. You'll need to
-// // rewrite this call manually.
-// $api_key = variable_get(ELASTIC_EMAIL_API_KEY, NULL);
-
+    $api_key = \Drupal::config('elastic_email.settings')->get('api_key');
     $this->setApiParameter('api_key', $api_key);
   }
 
