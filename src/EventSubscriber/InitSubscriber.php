@@ -5,6 +5,8 @@
 
 namespace Drupal\elastic_email\EventSubscriber;
 
+use Drupal\elastic_email\Api\ElasticEmailApiAccountDetails;
+use Drupal\elastic_email\Api\ElasticEmailException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -18,10 +20,10 @@ class InitSubscriber implements EventSubscriberInterface {
   }
 
   public function onEvent() {
-    if (\Drupal::currentUser()->hasPermission('administer site configuration') && path_is_admin(\Drupal\Core\Url::fromRoute("<current>")->toString())) {
+    if (\Drupal::currentUser()->hasPermission('administer site configuration') && \Drupal::service('router.admin_context')->isAdminRoute()) {
       try {
         $account_data = ElasticEmailApiAccountDetails::getInstance()->makeRequest();
-        $credit_low_threshold = \Drupal::config('elastic_email.settings')->get('elastic_email_credit_low_threshold');
+        $credit_low_threshold = \Drupal::config('elastic_email.settings')->get('credit_low_threshold');
         if ($account_data['credit'] <= $credit_low_threshold) {
           drupal_set_message(t('Your Elastic Email credit is getting low - currently at %credit %currency', [
             '%credit' => $account_data['credit'],
@@ -29,8 +31,7 @@ class InitSubscriber implements EventSubscriberInterface {
           ]), 'warning', FALSE);
         }
       }
-      
-        catch (ElasticEmailException $e) {
+      catch (ElasticEmailException $e) {
       }
     }
   }
