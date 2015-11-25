@@ -1,13 +1,24 @@
 <?php
-namespace Drupal\elastic_email;
+namespace Drupal\Plugin\Mail;
+
+use Drupal\Core\Mail\MailInterface;
+use Drupal\Component\Utility\Html;
 
 /**
  * Modify the drupal mail system to use smtp when sending emails.
  * Include the option to choose between plain text or HTML
+ *
+ * @Mail(
+ *   id = "elastic_email_mail",
+ *   label = @Translation("Elastic Email Mailer"),
+ *   description = @Translation("Sends emails via Elastic Email.")
+ * )
  */
-class ElasticEmailMailSystem implements MailSystemInterface {
+class ElasticEmailMailSystem implements MailInterface {
 
-  protected $AllowHtml;
+  protected static $sendUrl = 'https://api.elasticemail.com/mailer/send';
+
+  protected $allowHtml;
 
   /**
    * Concatenate and wrap the e-mail body for either plain-text or HTML emails.
@@ -19,7 +30,7 @@ class ElasticEmailMailSystem implements MailSystemInterface {
    *   The formatted $message.
    */
   public function format(array $message) {
-    $this->AllowHtml = TRUE;
+    $this->allowHtml = TRUE;
     $message['body'] = implode("\n\n", $message['body']);
     return $message;
   }
@@ -36,16 +47,11 @@ class ElasticEmailMailSystem implements MailSystemInterface {
    *   TRUE if the mail was successfully accepted, otherwise FALSE.
    */
   public function mail(array $message) {
-    // @FIXME
-// // @FIXME
-// // The correct configuration object could not be determined. You'll need to
-// // rewrite this call manually.
-// $is_queue_enabled = variable_get(ELASTIC_EMAIL_QUEUE_ENABLED, FALSE);
-
+    $is_queue_enabled = \Drupal::config('elastic_email.settings')->get('queue_enabled');
 
     // If queueing is available and enabled, queue the message.
     if ($is_queue_enabled) {
-      $queue = DrupalQueue::get('elastic_email');
+      $queue = \Drupal::queue('elastic_email');
       $queue->createItem($message);
       $queue->createQueue();
 
@@ -95,7 +101,7 @@ class ElasticEmailMailSystem implements MailSystemInterface {
    *   The plain-text body of the message.
    * @param string $body_html
    *   The html-text body of the message.
-   * @param string $elastic_username
+   * @param string $username
    *   (optional) The Elastic Email account username (typically the account email
    *   address). If not provided, the value from the module configuration is used.
    * @param string $api_key
@@ -109,29 +115,18 @@ class ElasticEmailMailSystem implements MailSystemInterface {
    *
    * @todo Provide support for HTML-based email and attachments?
    */
-  public static function elasticEmailSend($from, $from_name = NULL, $to, $subject = '', $body_text = NULL, $body_html = NULL, $elastic_username = NULL, $api_key = NULL) {
-    if (!$elastic_username) {
-      // If no username provided, get it from the module configuration.
-      // @FIXME
-// // @FIXME
-// // The correct configuration object could not be determined. You'll need to
-// // rewrite this call manually.
-// $elastic_username = variable_get(ELASTIC_EMAIL_USERNAME, NULL);
-
+  public static function elasticEmailSend($from, $from_name = NULL, $to, $subject = '', $body_text = NULL, $body_html = NULL, $username = NULL, $api_key = NULL) {
+    // If no username provided, get it from the module configuration.
+    if (!$username) {
+      $username = \Drupal::config('system.site')->get('username');
     }
-
+    // If no API Key provided, get it from the module configuration.
     if (!$api_key) {
-      // If no API Key provided, get it from the module configuration.
-      // @FIXME
-// // @FIXME
-// // The correct configuration object could not be determined. You'll need to
-// // rewrite this call manually.
-// $api_key = variable_get(ELASTIC_EMAIL_API_KEY, NULL);
-
+      $api_key = \Drupal::config('system.site')->get('api_key');
     }
-    $result = array();
 
-    if (empty($elastic_username) || empty($api_key)) {
+    $result = array();
+    if (empty($username) || empty($api_key)) {
       $result['error'] = t('Unable to send email to Elastic Email because username or API key not specified.');
     }
     elseif (empty($from) || empty($to) || (empty($subject) && empty($body_text))) {
@@ -140,7 +135,7 @@ class ElasticEmailMailSystem implements MailSystemInterface {
 
     if (!isset($result['error'])) {
       // It's necessary to urlencode() each of the data values.
-      $data = 'username=' . urlencode($elastic_username);
+      $data = 'username=' . urlencode($username);
       $data .= '&api_key=' . urlencode($api_key);
       $data .= '&from=' . urlencode($from);
       $data .= '&reply_to=' . urlencode($from);
@@ -160,17 +155,17 @@ class ElasticEmailMailSystem implements MailSystemInterface {
         $data .= '&body_html=' . urlencode($body_html);
       }
 
-      if (\Drupal::config('elastic_email.settings')->get('elastic_email_use_default_channel')) {
-        $data .= '&channel=' . \Drupal::config('elastic_email.settings')->get('elastic_email_default_channel');
+      if (\Drupal::config('elastic_email.settings')->get('use_default_channel')) {
+        $data .= '&channel=' . \Drupal::config('elastic_email.settings')->get('default_channel');
       }
 
       $ctx = stream_context_create(array(
         'http' => array('method' => 'post', 'content' => $data)
       ));
-      $fp = @fopen(ELASTIC_EMAIL_ENDPOINT, 'rb', FALSE, $ctx);
+      $fp = @fopen(self::$sendUrl, 'rb', FALSE, $ctx);
 
       // The response should be safe, but call check_plain() for paranoia's sake.
-      $response = \Drupal\Component\Utility\SafeMarkup::checkPlain(@stream_get_contents($fp));
+      $response = Html::escape(@stream_get_contents($fp));
 
       if (empty($response)) {
         $result['error'] = t('Error: no response (or empty response) received from Elastic Email service.');
@@ -217,12 +212,7 @@ class ElasticEmailMailSystem implements MailSystemInterface {
   protected function send($message = array()) {
     // If there's no 'from', then use the default site email.
     if (empty($message['from'])) {
-      // @FIXME
-// // @FIXME
-// // This looks like another module's variable. You'll need to rewrite this call
-// // to ensure that it uses the correct configuration object.
-// $from = variable_get('site_mail', NULL);
-
+      $from = \Drupal::config('system.site')->get('mail');
       if (!empty($from)) {
         $message['from'] = $from;
       }
@@ -251,33 +241,31 @@ class ElasticEmailMailSystem implements MailSystemInterface {
     }
 
     // Concatenate recipients to a semi-colon separated string.
+    $to = '';
     if (count($recipients)) {
       $to = implode('; ', $recipients);
     }
 
     // Check the header content type to see if email is plain text, if not we
     // send as HTML.
-    $s_html = (strpos($message['headers']['Content-Type'], 'text/plain') !== FALSE);
+    $is_html = (strpos($message['headers']['Content-Type'], 'text/plain') !== FALSE);
 
     // Attempt to send the message.
-    $result = self::elasticEmailSend($from, $from_name, $to, $message['subject'],
-      ($s_html ? NULL : $message['body']), ($s_html ? $message['body'] : NULL));
+    $body_text = ($is_html ? NULL : $message['body']);
+    $body_html = ($is_html ? $message['body'] : NULL);
+    $result = self::elasticEmailSend($from, $from_name, $to, $message['subject'], $body_text, $body_html);
 
     if (isset($result['error'])) {
       // If there's an error, log it.
       \Drupal::logger('elastic_email')->critical('Failed to send email.  Reason: ' . $result['error'], []);
     }
-    // @FIXME
-// // @FIXME
-// // The correct configuration object could not be determined. You'll need to
-// // rewrite this call manually.
-// if (variable_get(ELASTIC_EMAIL_LOG_SUCCESS, FALSE)) {
-//       // If success, only log if the ELASTIC_EMAIL_LOG_SUCCESS variable is TRUE.
-//       if (isset($result['success'])) {
-//         watchdog('elastic_email', 'Email sent successfully: ' . $result['success']['msg'], NULL, WATCHDOG_INFO);
-//       }
-//     }
 
+    if (\Drupal::config('system.site')->get('log_success')) {
+      // If success, only log if the ELASTIC_EMAIL_LOG_SUCCESS variable is TRUE.
+      if (isset($result['success'])) {
+        \Drupal::logger('elastic_email')->info('Email sent successfully: ' . $result['success']['msg'], []);
+      }
+    }
 
     return isset($result['success']) && $result['success'] ? TRUE : FALSE;
   }
