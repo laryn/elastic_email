@@ -1,5 +1,5 @@
 <?php
-namespace Drupal\elastic_email;
+namespace Drupal\elastic_email\Api;
 
 /**
  * Class for handing the account-details API call.
