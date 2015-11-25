@@ -21,7 +21,7 @@ class ElasticEmailApiActivityLog extends ElasticEmailApi {
   /**
    * Returns the data about the Elastic Email account.
    *
-   * @param object $response
+   * @param string $data
    *   The drupal_http_request object from the call to Elastic Email API.
    *
    * @return array
@@ -29,8 +29,8 @@ class ElasticEmailApiActivityLog extends ElasticEmailApi {
    *
    * @throws ElasticEmailException
    */
-  protected function processResponse($response) {
-    $lines = explode(PHP_EOL, trim($response->data));
+  protected function processResponse($data) {
+    $lines = explode(PHP_EOL, trim($data));
 
     $data = array();
     foreach ($lines as $line) {

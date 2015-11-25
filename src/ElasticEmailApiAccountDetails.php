@@ -16,7 +16,7 @@ class ElasticEmailApiAccountDetails extends ElasticEmailApi {
   /**
    * Returns the data about the Elastic Email account.
    *
-   * @param object $response
+   * @param string $data
    *   The drupal_http_request object from the call to Elastic Email API.
    *
    * @return array
@@ -24,10 +24,10 @@ class ElasticEmailApiAccountDetails extends ElasticEmailApi {
    *
    * @throws ElasticEmailException
    */
-  protected function processResponse($response) {
-    $accountDetails = simplexml_load_string($response->data);
+  protected function processResponse($data) {
+    $accountDetails = simplexml_load_string($data);
     if (empty($accountDetails)) {
-      throw new ElasticEmailException($response->data);
+      throw new ElasticEmailException($data);
     }
 
     $data = array();

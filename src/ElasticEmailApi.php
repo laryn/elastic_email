@@ -60,57 +60,56 @@ abstract class ElasticEmailApi {
 
     // Return the cached data if there is any.
     $cacheKey = 'elastic_email_api_call::' . $this->apiCallPath;
-    $cachedApiCallResponse = \Drupal::cache('cache')->get($cacheKey);
+    /*$cachedApiCallResponse = \Drupal::cache('cache')->get($cacheKey);
     if ($cached && $cachedApiCallResponse && (REQUEST_TIME < $cachedApiCallResponse->expire)) {
       // Get the cached response for the API call.
       $response =  $cachedApiCallResponse->data;
     }
-    else {
+    else {*/
       // Make the API request.
       $url = $this->apiUrl . $this->apiCallPath . '?' . $this->getApiFormattedParameters();
-      // @FIXME
-// drupal_http_request() has been replaced by the Guzzle HTTP client, which is bundled
-// with Drupal core.
-//
-//
-// @see https://www.drupal.org/node/1862446
-// @see http://docs.guzzlephp.org/en/latest
-// $response = drupal_http_request($url);
 
-
+      /** @var \GuzzleHttp\Client $client */
+      try {
+        $response = \Drupal::httpClient()->get($url);
+        $data = (string) $response->getBody();
+      }
+      catch (\Exception $e) {
+        watchdog_exception('elastic_email', $e);
+      }
       // Cache lifetime - 5 minutes.
       $expiryTime = REQUEST_TIME + (60 * 5);
 
       // Save the data in cache.
-      \Drupal::cache('cache')->set($cacheKey, $response, $expiryTime);
-    }
+      /*\Drupal::cache('cache')->set($cacheKey, $response, $expiryTime);
+    }*/
 
-    $this->validateResponse($response);
-    return $this->processResponse($response);
+    $this->validateResponse($data);
+    return $this->processResponse($data);
   }
 
   /**
    * Method to be called on the child class to process the response.
    *
-   * @param object $response
-   *   The drupal_http_request object from the call to Elastic Email API.
+   * @param string $data
+   *   The data returned from the call to Elastic Email API.
    */
-  abstract protected function processResponse($response);
+  abstract protected function processResponse($data);
 
   /**
    * Validates the response from the API.
    *
-   * @param stdClass $response
+   * @param string $data
    *   The response object from the drupal_http_request call.
    *
    * @throws ElasticEmailException
    */
-  protected function validateResponse($response) {
-    if (empty($response->data) && isset($response->error)) {
+  protected function validateResponse($data) {
+    /*if (empty($response->data) && isset($response->error)) {
       drupal_set_message('Elastic Email error: ' . $response->error, 'warning');
       throw new ElasticEmailException('Elastic Email error: ' . $response->error);
-    }
-    if (substr($response->data, 0, strlen('Unauthorized:')) == 'Unauthorized:') {
+    }*/
+    if (substr($data, 0, strlen('Unauthorized:')) == 'Unauthorized:') {
       throw new ElasticEmailException('Elastic Email: Invalid API credentials set.');
     }
   }

@@ -13,14 +13,14 @@ class ElasticEmailApiChannelList extends ElasticEmailApi {
   /**
    * Returns the list of channels from the Elastic Email account.
    *
-   * @param object $response
+   * @param string $data
    *   The drupal_http_request object from the call to Elastic Email API.
    *
    * @return array
    *   The list of channels.
    */
-  protected function processResponse($response) {
-    $channelList = simplexml_load_string($response->data);
+  protected function processResponse($data) {
+    $channelList = simplexml_load_string($data);
 
     $data = array();
     foreach ($channelList->children() as $item) {
