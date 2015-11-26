@@ -34,10 +34,6 @@ class ElasticEmailSettingsForm extends ConfigFormBase {
     $config->set('default_channel', $form['settings']['default_channel']['#value']);
     $config->save();
 
-    if (method_exists($this, '_submitForm')) {
-      $this->_submitForm($form, $form_state);
-    }
-
     parent::submitForm($form, $form_state);
   }
 
@@ -132,7 +128,8 @@ class ElasticEmailSettingsForm extends ConfigFormBase {
       '#default_value' => \Drupal::config('elastic_email.settings')->get('use_default_channel'),
     ];
 
-    $url = parse_url($base_url);
+    // @todo use the current base_url as a default value.
+    //$url = parse_url($base_url);
     $form['settings']['default_channel'] = [
       '#type' => 'textfield',
       '#size' => 48,
@@ -141,7 +138,7 @@ class ElasticEmailSettingsForm extends ConfigFormBase {
       '#default_value' => \Drupal::config('elastic_email.settings')->get('default_channel'),
       '#states' => [
         'visible' => [
-          ':input[name="elastic_email_use_default_channel"]' => [
+          ':input[name="use_default_channel"]' => [
             'checked' => TRUE
             ]
           ]
