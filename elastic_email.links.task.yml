@@ -7,8 +7,8 @@ elastic_email.activity_log:
   title: 'Activity Log'
   weight: 1
   base_route: elastic_email.dashboard
-elastic_email.settings_form:
-  route_name: elastic_email.settings_form
+elastic_email.admin_settings:
+  route_name: elastic_email.admin_settings
   title: Settings
   weight: 10
   base_route: elastic_email.dashboard

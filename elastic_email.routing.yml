@@ -2,7 +2,7 @@ elastic_email.dashboard:
   path: /admin/config/system/elastic_email
   defaults:
     _title: 'Elastic Email'
-    _controller: '\Drupal\elastic_email\Controller\DefaultController::elastic_email_dashboard'
+    _controller: '\Drupal\elastic_email\Controller\ElasticEmailController::dashboard'
   requirements:
     _permission: 'administer site configuration'
 elastic_email.activity_log:
@@ -12,10 +12,10 @@ elastic_email.activity_log:
     _form: \Drupal\elastic_email\Form\ElasticEmailActivityLog
   requirements:
     _permission: 'administer site configuration'
-elastic_email.settings_form:
+elastic_email.admin_settings:
   path: /admin/config/system/elastic_email/settings
   defaults:
-    _title: Settings
+    _title: 'Settings'
     _form: \Drupal\elastic_email\Form\ElasticEmailSettingsForm
   requirements:
     _permission: 'administer site configuration'

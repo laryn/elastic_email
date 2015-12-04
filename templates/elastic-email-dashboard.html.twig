@@ -1,0 +1,32 @@
+{#
+/**
+ * @file
+ * Elastic Email dashboard
+ */
+#}
+<div class="ee-dashboard">
+  <div class="ee-dashboard-box">
+    <div>
+      <span class="ee-dashboard-value">{{ data['credit'] }} {{ data['currency'] }}</span>
+      {{ 'Current Credit Amount'|t }}
+    </div>
+  </div>
+  <div class="ee-dashboard-box">
+    <div>
+      <span class="ee-dashboard-value">{{ data['totalemailssent'] }}</span>
+      {{ 'Emails Sent'|t }}
+    </div>
+  </div>
+  <div class="ee-dashboard-box">
+    <div>
+      <span class="ee-dashboard-value">{{ data['priceperemail'] * 1000 }} {{ data['currency'] }}</span>
+      {{ 'Cost per thousand'|t }}
+    </div>
+  </div>
+  <div class="ee-dashboard-box">
+    <div>
+      <span class="ee-dashboard-value">{{ data['reputation'] }} / 5</span>
+      {{ 'Reputation'|t }}
+    </div>
+  </div>
+</div>
