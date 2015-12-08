@@ -18,8 +18,6 @@ class ElasticEmailMailSystem implements MailInterface {
 
   protected static $sendUrl = 'https://api.elasticemail.com/mailer/send';
 
-  protected $allowHtml;
-
   /**
    * Concatenate and wrap the e-mail body for either plain-text or HTML emails.
    *
@@ -30,21 +28,22 @@ class ElasticEmailMailSystem implements MailInterface {
    *   The formatted $message.
    */
   public function format(array $message) {
-    $this->allowHtml = TRUE;
+    // Join the body array into one string.
     $message['body'] = implode("\n\n", $message['body']);
+
     return $message;
   }
 
   /**
    * Send the e-mail message.
    *
-   * @see drupal_mail()
-   *
    * @param array $message
    *   A message array, as described in hook_mail_alter().
    *
    * @return bool
    *   TRUE if the mail was successfully accepted, otherwise FALSE.
+   *
+   * @see \Drupal\Core\Mail\MailManagerInterface::mail()
    */
   public function mail(array $message) {
     $is_queue_enabled = \Drupal::config('elastic_email.settings')->get('queue_enabled');
@@ -118,11 +117,11 @@ class ElasticEmailMailSystem implements MailInterface {
   public static function elasticEmailSend($from, $from_name = NULL, $to, $subject = '', $body_text = NULL, $body_html = NULL, $username = NULL, $api_key = NULL) {
     // If no username provided, get it from the module configuration.
     if (!$username) {
-      $username = \Drupal::config('system.site')->get('username');
+      $username = \Drupal::config('elastic_email.settings')->get('username');
     }
     // If no API Key provided, get it from the module configuration.
     if (!$api_key) {
-      $api_key = \Drupal::config('system.site')->get('api_key');
+      $api_key = \Drupal::config('elastic_email.settings')->get('api_key');
     }
 
     $result = array();
