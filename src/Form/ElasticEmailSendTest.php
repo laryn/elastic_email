@@ -10,6 +10,7 @@ namespace Drupal\elastic_email\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\elastic_email\Plugin\Mail\ElasticEmailMailSystem;
 
 class ElasticEmailSendTest extends FormBase {
 
@@ -26,7 +27,7 @@ class ElasticEmailSendTest extends FormBase {
    *
    * @return array
    */
-  public function buildForm(array $form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state) {
     /*if (!_elastic_email_has_valid_settings()) {
       drupal_set_message(t('You need to configure your Elastic Email settings.'), 'error');
       return $form;
@@ -80,7 +81,7 @@ class ElasticEmailSendTest extends FormBase {
    * @param array $form
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    */
-  public function submitForm(array &$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     $site_mail = \Drupal::config('system.site')->get('mail');
     $username = \Drupal::config('elastic_email.settings')->get('username');
     $api_key  = \Drupal::config('elastic_email.settings')->get('api_key');

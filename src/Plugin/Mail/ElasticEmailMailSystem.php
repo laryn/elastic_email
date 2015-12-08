@@ -1,5 +1,5 @@
 <?php
-namespace Drupal\Plugin\Mail;
+namespace Drupal\elastic_email\Plugin\Mail;
 
 use Drupal\Core\Mail\MailInterface;
 use Drupal\Component\Utility\Html;
