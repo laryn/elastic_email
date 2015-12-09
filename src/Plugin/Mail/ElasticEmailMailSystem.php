@@ -46,11 +46,9 @@ class ElasticEmailMailSystem implements MailInterface {
    * @see \Drupal\Core\Mail\MailManagerInterface::mail()
    */
   public function mail(array $message) {
-    $is_queue_enabled = \Drupal::config('elastic_email.settings')->get('queue_enabled');
-
     // If queueing is available and enabled, queue the message.
-    if ($is_queue_enabled) {
-      $queue = \Drupal::queue('elastic_email');
+    if (\Drupal::config('elastic_email.settings')->get('queue_enabled')) {
+      $queue = \Drupal::queue('elastic_email_process_queue');
       $queue->createItem($message);
       $queue->createQueue();
 
@@ -114,7 +112,7 @@ class ElasticEmailMailSystem implements MailInterface {
    *
    * @todo Provide support for HTML-based email and attachments?
    */
-  public static function elasticEmailSend($from, $from_name = NULL, $to, $subject = '', $body_text = NULL, $body_html = NULL, $username = NULL, $api_key = NULL) {
+  public function elasticEmailSend($from, $from_name = NULL, $to, $subject = '', $body_text = NULL, $body_html = NULL, $username = NULL, $api_key = NULL) {
     // If no username provided, get it from the module configuration.
     if (!$username) {
       $username = \Drupal::config('elastic_email.settings')->get('username');
@@ -186,20 +184,6 @@ class ElasticEmailMailSystem implements MailInterface {
   }
 
   /**
-   * Sends the emails from the queue when called from the cron.
-   *
-   * @param array $message
-   *   Standard Drupal email message object.
-   *
-   * @return bool
-   *   TRUE if message delivered; FALSE otherwise.
-   */
-  public static function cronSend(array $message) {
-    $mail = new self();
-    return $mail->send($message);
-  }
-
-  /**
    * Email sending function, called from job queue, or directly.
    *
    * @param array $message
@@ -208,7 +192,7 @@ class ElasticEmailMailSystem implements MailInterface {
    * @return bool
    *   TRUE if message delivered; FALSE otherwise.
    */
-  protected function send($message = array()) {
+  public function send($message = array()) {
     // If there's no 'from', then use the default site email.
     if (empty($message['from'])) {
       $from = \Drupal::config('system.site')->get('mail');
@@ -252,7 +236,7 @@ class ElasticEmailMailSystem implements MailInterface {
     // Attempt to send the message.
     $body_text = ($is_html ? NULL : $message['body']);
     $body_html = ($is_html ? $message['body'] : NULL);
-    $result = self::elasticEmailSend($from, $from_name, $to, $message['subject'], $body_text, $body_html);
+    $result = $this->elasticEmailSend($from, $from_name, $to, $message['subject'], $body_text, $body_html);
 
     if (isset($result['error'])) {
       // If there's an error, log it.

@@ -98,7 +98,8 @@ class ElasticEmailSendTest extends FormBase {
       $html_body = NULL;
     }
 
-    $result = ElasticEmailMailSystem::elasticEmailSend($site_mail, NULL, $to, $subject, $text_body, $html_body, $username, $api_key);
+    $mail = new ElasticEmailMailSystem();
+    $result = $mail->elasticEmailSend($site_mail, NULL, $to, $subject, $text_body, $html_body, $username, $api_key);
 
     if (isset($result['error'])) {
       // There was an error. Return error HTML.
