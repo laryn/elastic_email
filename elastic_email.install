@@ -8,39 +8,40 @@
  * Implements hook_install().
  */
 function elastic_email_install() {
+  \Drupal::configFactory()->getEditable('mailsystem.settings')
+    ->set('defaults', [
+      'sender' => 'elastic_email_email',
+      'formatter' => 'elastic_email_email'
+    ])
+    ->save();
+
   // Ensure translations don't break at install time.
-  $t = 't';
+  /*$t = 't';
 
   // Provide a helpful link to the user at install time.
   // @FIXME
 // l() expects a Url object, created from a route name or external URI.
 // $config_link = l($t('Administer > Configuration > System > Elastic Email'), 'admin/config/system/elastic_email');
+  $config_link = \Drupal::l($t('Administer > Configuration > System > Elastic Email'), \Drupal\Core\Url::fromRoute('elastic_email.dashboard'));
 
   $help_link = \Drupal::l($t('Administer > Help > Elastic Email'), \Drupal\Core\Url::fromRoute('help.page'));
 
   drupal_set_message($t('Elastic Email settings are available at @config, and online help is available at @help.',
     array('@config' => $config_link, '@help' => $help_link)
-  ));
-}
-
-/**
- * Implements hook_enable().
- */
-function elastic_email_enable() {
-  //mailsystem_set(array('default-system' => 'ElasticEmailMailSystem'));
-}
-
-/**
- * Implements hook_disable().
- */
-function elastic_email_disable() {
-  //mailsystem_clear(array('default-system' => 'ElasticEmailMailSystem'));
+  ));*/
 }
 
 /**
  * Implements hook_uninstall().
  */
 function elastic_email_uninstall() {
+  \Drupal::configFactory()->getEditable('mailsystem.settings')
+    ->set('defaults', [
+      'sender' => 'php_mail',
+      'formatter' => 'php_mail'
+    ])
+    ->save();
+
   // Remove the variables we've set.
   // @FIXME
 // // @FIXME
