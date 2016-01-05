@@ -60,12 +60,14 @@ abstract class ElasticEmailApi {
 
     // Return the cached data if there is any.
     $cacheKey = 'elastic_email_api_call::' . $this->apiCallPath;
-    /*$cachedApiCallResponse = \Drupal::cache('cache')->get($cacheKey);
+    $cachedApiCallResponse = \Drupal::cache()->get($cacheKey);
+
+    $data = NULL;
     if ($cached && $cachedApiCallResponse && (REQUEST_TIME < $cachedApiCallResponse->expire)) {
       // Get the cached response for the API call.
-      $response =  $cachedApiCallResponse->data;
+      $data = $cachedApiCallResponse->data;
     }
-    else {*/
+    else {
       // Make the API request.
       $url = $this->apiUrl . $this->apiCallPath . '?' . $this->getApiFormattedParameters();
 
@@ -73,16 +75,17 @@ abstract class ElasticEmailApi {
       try {
         $response = \Drupal::httpClient()->get($url);
         $data = (string) $response->getBody();
+
+        // Cache lifetime - 5 minutes.
+        $expiryTime = REQUEST_TIME + (60 * 5);
+
+        // Save the data in cache.
+        \Drupal::cache()->set($cacheKey, $data, $expiryTime);
       }
       catch (\Exception $e) {
         watchdog_exception('elastic_email', $e);
       }
-      // Cache lifetime - 5 minutes.
-      $expiryTime = REQUEST_TIME + (60 * 5);
-
-      // Save the data in cache.
-      /*\Drupal::cache('cache')->set($cacheKey, $response, $expiryTime);
-    }*/
+    }
 
     $this->validateResponse($data);
     return $this->processResponse($data);
