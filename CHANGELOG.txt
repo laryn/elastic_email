@@ -3,6 +3,11 @@ Elastic Email 7.x-x.x, xxxx-xx-xx
 ------------------------------
 
 
+Elastic Email 7.x-2.1, xxxx-xx-xx
+------------------------------
+Issue #2657784 by mike.davis: Update variable name $s_html
+
+
 Elastic Email 7.x-2.0, 2016-01-27
 ------------------------------
 Issue #2545102 by mike.davis: Undefined property: stdClass::$data error when no
