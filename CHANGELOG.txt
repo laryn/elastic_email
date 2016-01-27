@@ -3,7 +3,7 @@ Elastic Email 7.x-x.x, xxxx-xx-xx
 ------------------------------
 
 
-Elastic Email 7.x-2.0-rc2, xxxx-xx-xx
+Elastic Email 7.x-2.0, 2016-01-27
 ------------------------------
 Issue #2545102 by mike.davis: Undefined property: stdClass::$data error when no
   connection
