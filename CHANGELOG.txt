@@ -5,7 +5,9 @@ Elastic Email 7.x-x.x, xxxx-xx-xx
 
 Elastic Email 7.x-2.0-rc2, xxxx-xx-xx
 ------------------------------
-Issue #2545102 by mike.davis: Undefined property: stdClass::$data error when no connection
+Issue #2545102 by mike.davis: Undefined property: stdClass::$data error when no
+  connection
+Issue #1047810 by mike.davis, alexdav: html email not working
 
 
 Elastic Email 7.x-2.0-rc1, 2015-02-11
