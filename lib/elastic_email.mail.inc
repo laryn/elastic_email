@@ -241,11 +241,11 @@ class ElasticEmailMailSystem implements MailSystemInterface {
 
     // Check the header content type to see if email is plain text, if not we
     // send as HTML.
-    $s_html = (strpos($message['headers']['Content-Type'], 'text/plain') === FALSE);
+    $is_html = (strpos($message['headers']['Content-Type'], 'text/plain') === FALSE);
 
     // Attempt to send the message.
     $result = self::elasticEmailSend($from, $from_name, $to, $message['subject'],
-      ($s_html ? NULL : $message['body']), ($s_html ? $message['body'] : NULL));
+      ($is_html ? NULL : $message['body']), ($is_html ? $message['body'] : NULL));
 
     if (isset($result['error'])) {
       // If there's an error, log it.
