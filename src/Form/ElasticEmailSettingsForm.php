@@ -55,6 +55,8 @@ class ElasticEmailSettingsForm extends ConfigFormBase {
       drupal_set_message(t("You must enable 'allow_url_fopen' in your php.ini settings to be able to use this service."), 'error');
     }
 
+    $config = \Drupal::config('elastic_email.settings');
+
     // Fieldset to hold credential fields, and Test fieldset.
     $form['credentials'] = [
       '#type' => 'fieldset',
@@ -66,7 +68,7 @@ class ElasticEmailSettingsForm extends ConfigFormBase {
       '#size' => 48,
       '#title' => t('API username'),
       '#required' => TRUE,
-      '#default_value' => \Drupal::config('elastic_email.settings')->get('username'),
+      '#default_value' => $config->get('username'),
       '#description' => t('This is typically your Elastic Email account email address.'),
     );
 
@@ -75,7 +77,7 @@ class ElasticEmailSettingsForm extends ConfigFormBase {
       '#size' => 48,
       '#title' => t('API Key'),
       '#required' => TRUE,
-      '#default_value' => \Drupal::config('elastic_email.settings')->get('api_key'),
+      '#default_value' => $config->get('api_key'),
       '#description' => t('The API Key format is typically <tt>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</tt>.'),
     );
 
@@ -97,14 +99,14 @@ class ElasticEmailSettingsForm extends ConfigFormBase {
       '#title' => t('Queue outgoing messages'),
       '#description' => t('When checked, outgoing messages will be queued via Drupal core system queue, and delivered when the queue is emptied at cron time. When unchecked, messages are delivered immediately (synchronously). Note that synchronous delivery can cause delay in page execution time.') .
         '<br /><br />' . t('If enabled, you can use the <a href="@link" target="_blank">Queue UI</a> to view the queue.', array('@link' => 'https://www.drupal.org/project/queue_ui')),
-      '#default_value' => \Drupal::config('elastic_email.settings')->get('queue_enabled'),
+      '#default_value' => $config->get('queue_enabled'),
     );
 
     $form['options']['log_success'] = array(
       '#type' => 'checkbox',
       '#title' => t('Log message delivery success'),
       '#description' => t('When checked, a log message will also be generated for <em>successful</em> email delivery. Errors are always logged.'),
-      '#default_value' => \Drupal::config('elastic_email.settings')->get('log_success'),
+      '#default_value' => $config->get('log_success'),
     );
 
     // Fieldset for other settings.
@@ -118,24 +120,28 @@ class ElasticEmailSettingsForm extends ConfigFormBase {
       '#size' => 8,
       '#title' => t('Low Credit Threshold (USD)'),
       '#description' => t('Sets the lower threshold limit value of when to warn admin users about a low credit limit.'),
-      '#default_value' => \Drupal::config('elastic_email.settings')->get('credit_low_threshold'),
+      '#default_value' => $config->get('credit_low_threshold'),
     ];
 
     $form['settings']['use_default_channel'] = [
       '#type' => 'checkbox',
       '#title' => t('Use a Default Channel'),
       '#description' => t('If no default channel is set, then the default (set by Elastic Email) is the sending email address.<br />Setting a default channel will add this value to every email that is sent, meaning that you can more easily identify email that has come from each specific site within the reporting section.'),
-      '#default_value' => \Drupal::config('elastic_email.settings')->get('use_default_channel'),
+      '#default_value' => $config->get('use_default_channel'),
     ];
 
-    // @todo use the current base_url as a default value.
-    //$url = parse_url($base_url);
+    $default_channel = $config->get('default_channel');
+    if (empty($default_channel)) {
+      $url = parse_url($base_url);
+      $default_channel = $url['host'];
+    }
+
     $form['settings']['default_channel'] = [
       '#type' => 'textfield',
       '#size' => 48,
       '#maxlength' => 60,
       '#title' => t('Default Channel'),
-      '#default_value' => \Drupal::config('elastic_email.settings')->get('default_channel'),
+      '#default_value' => $default_channel,
       '#states' => [
         'visible' => [
           ':input[name="use_default_channel"]' => [
