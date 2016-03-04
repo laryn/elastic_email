@@ -10,31 +10,17 @@
 function elastic_email_install() {
   \Drupal::configFactory()->getEditable('mailsystem.settings')
     ->set('defaults', [
-      'sender' => 'elastic_email_email',
-      'formatter' => 'elastic_email_email'
+      'sender' => 'elastic_email_mail',
+      'formatter' => 'elastic_email_mail'
     ])
     ->save();
-
-  // Ensure translations don't break at install time.
-  /*$t = 't';
-
-  // Provide a helpful link to the user at install time.
-  // @FIXME
-// l() expects a Url object, created from a route name or external URI.
-// $config_link = l($t('Administer > Configuration > System > Elastic Email'), 'admin/config/system/elastic_email');
-  $config_link = \Drupal::l($t('Administer > Configuration > System > Elastic Email'), \Drupal\Core\Url::fromRoute('elastic_email.dashboard'));
-
-  $help_link = \Drupal::l($t('Administer > Help > Elastic Email'), \Drupal\Core\Url::fromRoute('help.page'));
-
-  drupal_set_message($t('Elastic Email settings are available at @config, and online help is available at @help.',
-    array('@config' => $config_link, '@help' => $help_link)
-  ));*/
 }
 
 /**
  * Implements hook_uninstall().
  */
 function elastic_email_uninstall() {
+  // Revert to mailsystem standard settings.
   \Drupal::configFactory()->getEditable('mailsystem.settings')
     ->set('defaults', [
       'sender' => 'php_mail',
@@ -43,28 +29,6 @@ function elastic_email_uninstall() {
     ->save();
 
   // Remove the variables we've set.
-  // @FIXME
-// // @FIXME
-// // The correct configuration object could not be determined. You'll need to
-// // rewrite this call manually.
-// variable_del(ELASTIC_EMAIL_USERNAME);
-
-  // @FIXME
-// // @FIXME
-// // The correct configuration object could not be determined. You'll need to
-// // rewrite this call manually.
-// variable_del(ELASTIC_EMAIL_API_KEY);
-
-  // @FIXME
-// // @FIXME
-// // The correct configuration object could not be determined. You'll need to
-// // rewrite this call manually.
-// variable_del(ELASTIC_EMAIL_QUEUE_ENABLED);
-
-  // @FIXME
-// // @FIXME
-// // The correct configuration object could not be determined. You'll need to
-// // rewrite this call manually.
-// variable_del(ELASTIC_EMAIL_LOG_SUCCESS);
-
+  \Drupal::configFactory()->getEditable('elastic_email.settings')
+    ->delete();
 }
