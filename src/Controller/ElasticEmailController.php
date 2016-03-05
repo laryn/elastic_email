@@ -29,6 +29,9 @@ class ElasticEmailController extends ControllerBase {
       $build = [
         '#theme' => 'elastic_email_dashboard',
         '#data' => $data,
+        '#attached' => [
+          'library' => ['elastic_email/admin'],
+        ],
       ];
 
       return $build;
