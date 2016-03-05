@@ -6,6 +6,8 @@
 namespace Drupal\elastic_email\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Link;
+use Drupal\Core\Url;
 use Drupal\elastic_email\Api\ElasticEmailApiAccountDetails;
 use Drupal\elastic_email\Api\ElasticEmailException;
 
@@ -24,18 +26,22 @@ class ElasticEmailController extends ControllerBase {
 
     try {
       $data = ElasticEmailApiAccountDetails::getInstance()->makeRequest(FALSE);
-      $build = array(
+      $build = [
         '#theme' => 'elastic_email_dashboard',
         '#data' => $data,
-      );
+      ];
+
       return $build;
     }
     catch (ElasticEmailException $e) {
-      $params = array('%settings' => \Drupal::l('settings', \Drupal\Core\Url::fromRoute('elastic_email.admin_settings')));
+      $route = Url::fromRoute('elastic_email.admin_settings');
+      $params = [
+        '%settings' => Link::fromTextAndUrl('settings', $route)->toString(),
+      ];
       drupal_set_message(t('You need to configure your Elastic Email %settings.', $params), 'error');
     }
 
-    return array();
+    return [];
   }
 
 }
