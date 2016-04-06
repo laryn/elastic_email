@@ -25,7 +25,10 @@ class ElasticEmailController extends ControllerBase {
     }*/
 
     try {
-      $data = ElasticEmailApiAccountDetails::getInstance()->makeRequest(FALSE);
+      /** @var ElasticEmailApiAccountDetails $service */
+      $service = \Drupal::service('elastic_email.api.account_details');
+      $data = $service->makeRequest(FALSE);
+
       $build = [
         '#theme' => 'elastic_email_dashboard',
         '#data' => $data,

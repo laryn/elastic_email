@@ -20,19 +20,25 @@ class InitSubscriber implements EventSubscriberInterface {
   }
 
   public function onEvent() {
-    if (\Drupal::currentUser()->hasPermission('administer site configuration') && \Drupal::service('router.admin_context')->isAdminRoute()) {
-      try {
-        $account_data = ElasticEmailApiAccountDetails::getInstance()->makeRequest();
-        $credit_low_threshold = \Drupal::config('elastic_email.settings')->get('credit_low_threshold');
-        if ($account_data['credit'] <= $credit_low_threshold) {
-          drupal_set_message(t('Your Elastic Email credit is getting low - currently at %credit %currency', [
-            '%credit' => $account_data['credit'],
-            '%currency' => $account_data['currency'],
-          ]), 'warning', FALSE);
-        }
+    if (!\Drupal::currentUser()->hasPermission('administer site configuration')
+      && !\Drupal::service('router.admin_context')->isAdminRoute()) {
+      return;
+    }
+
+    try {
+      /** @var ElasticEmailApiAccountDetails $service */
+      $service = \Drupal::service('elastic_email.api.account_details');
+      $accountData = $service->makeRequest();
+
+      $creditLowThreshold = \Drupal::config('elastic_email.settings')->get('credit_low_threshold');
+      if ($accountData['credit'] <= $creditLowThreshold) {
+        drupal_set_message(t('Your Elastic Email credit is getting low - currently at %credit %currency', [
+          '%credit' => $accountData['credit'],
+          '%currency' => $accountData['currency'],
+        ]), 'warning', FALSE);
       }
-      catch (ElasticEmailException $e) {
-      }
+    }
+    catch (ElasticEmailException $e) {
     }
   }
 

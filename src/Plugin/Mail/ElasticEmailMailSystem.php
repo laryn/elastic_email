@@ -5,8 +5,7 @@ use Drupal\Core\Mail\MailInterface;
 use Drupal\Component\Utility\Html;
 
 /**
- * Modify the drupal mail system to use smtp when sending emails.
- * Include the option to choose between plain text or HTML
+ * Modify the drupal mail system to use Elastic Email to send emails.
  *
  * @Mail(
  *   id = "elastic_email_mail",

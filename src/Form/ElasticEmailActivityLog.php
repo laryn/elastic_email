@@ -205,8 +205,9 @@ class ElasticEmailActivityLog extends FormBase {
    */
   protected function getChannelList() {
     try {
-      // Get the channel list.
-      return ElasticEmailApiChannelList::getInstance()->makeRequest();
+      /** @var ElasticEmailApiChannelList $channelList */
+      $channelList = \Drupal::service('elastic_email.api.channel_list');
+      return $channelList->makeRequest();
     }
     catch (ElasticEmailException $e) {
       drupal_set_message($e->getMessage(), 'error');
@@ -243,20 +244,18 @@ class ElasticEmailActivityLog extends FormBase {
    *   The log data from Elastic Email.
    */
   protected function getActivityDate($status, $channel, $fromDate, $toDate) {
-    $data = [];
     try {
       $fromDate = $this->formatDate($fromDate);
       $toDate = $this->formatDate($toDate);
 
-      $activityLog = new ElasticEmailApiActivityLog();
+      /** @var ElasticEmailApiActivityLog $activityLog */
+      $activityLog = \Drupal::service('elastic_email.api.activity_log');
       $activityLog->setParams($status, $channel, $fromDate, $toDate);
-      $data = $activityLog->makeRequest(FALSE);
+      return $activityLog->makeRequest(FALSE);
     }
     catch (ElasticEmailException $e) {
-      $data[] = $e->getMessage();
+      return [$e->getMessage()];
     }
-
-    return $data;
   }
 
 }

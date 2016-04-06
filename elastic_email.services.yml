@@ -4,3 +4,9 @@ services:
     tags:
       -
         name: event_subscriber
+  elastic_email.api.account_details:
+    class: Drupal\elastic_email\Api\ElasticEmailApiAccountDetails
+  elastic_email.api.activity_log:
+    class: Drupal\elastic_email\Api\ElasticEmailApiActivityLog
+  elastic_email.api.channel_list:
+    class: Drupal\elastic_email\Api\ElasticEmailApiChannelList
