@@ -13,6 +13,7 @@ function elastic_email_dashboard() {
 
   if (!_elastic_email_has_valid_settings()) {
     drupal_set_message(t('You need to configure your Elastic Email settings.'), 'error');
+    drupal_goto('admin/config/system/elastic_email/settings');
   }
 
   try {
@@ -150,11 +151,6 @@ function elastic_email_settings_form() {
  * Menu callback for the activity log.
  */
 function elastic_email_activity_log($form, &$form_state) {
-  if (!_elastic_email_has_valid_settings()) {
-    drupal_set_message(t('You need to configure your Elastic Email settings.'), 'error');
-    return $form;
-  }
-
   global $base_url;
 
   // Add CSS to make the AJAX part of the form look a little better.
@@ -321,6 +317,9 @@ function elastic_email_activity_log_table($form, &$form_state) {
   return $element;
 }
 
+/**
+ * Callback to check if the settings are valid.
+ */
 function _elastic_email_has_valid_settings() {
   $site_mail = variable_get('site_mail', NULL);
   $username = variable_get(ELASTIC_EMAIL_USERNAME, NULL);
@@ -343,11 +342,6 @@ function _elastic_email_has_valid_settings() {
  */
 function elastic_email_send_test($form, &$form_state) {
   $site_mail = variable_get('site_mail', NULL);
-
-  if (!_elastic_email_has_valid_settings()) {
-    drupal_set_message(t('You need to configure your Elastic Email settings.'), 'error');
-    return $form;
-  }
 
   $form['elastic_email_test_email_to'] = array(
     '#type' => 'textfield',
