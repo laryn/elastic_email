@@ -1,42 +1,22 @@
 
-Elastic Email 7.x-x.x, xxxx-xx-xx
+Elastic Email 8.x-x.x, xxxx-xx-xx
 ------------------------------
 
 
-Elastic Email 7.x-2.0-rc2, xxxx-xx-xx
+Elastic Email 8.x-2.0-beta3, xxxx-xx-xx
 ------------------------------
 Issue #2545102 by mike.davis: Undefined property: stdClass::$data error when no connection
 
 
-Elastic Email 7.x-2.0-rc1, 2015-02-11
+Elastic Email 8.x-2.0-beta2, 2016-04-06
 ------------------------------
-#2359643 by mike.davis: Provide ability to customise the test emails.
+Issue #2671216: Replace uses of \Drupal::l() with Link::fromTextAndUrl()
+Issue #2628514: Attach Elastic Email css file to the relevant settings pages
+Issue #2612360: ElasticEmailActivityLog - implement AJAX submit
+Issue #2681113: Reinstate the activity log tab
+Issue #2686559: Convert the API classes to Services
 
 
-Elastic Email 7.x-2.0-beta2, 2015-01-28
+Elastic Email 8.x-2.0-beta1, 2016-03-04
 ------------------------------
-#2292605 by mike.davis: Provide ability to view the log
-
-
-Elastic Email 7.x-2.0-beta1, 2014-10-20
-------------------------------
-#2292603 by mike.davis: Added facility to be able to set the default channel
-  for the site.
-#2292607 by mike.davis: Added ability to show how much credit is left on your
-  account.
-
-
-Elastic Email 7.x-1.1, 2014-10-01
-------------------------------
-#1068380 by mike.davis: Fixed Mimemail integration and drupal_mail bugfix.
-#1047810 by mike.davis: Fixed html email not working.
-#995640 by mike.davis: fix for no response (or empty response) received from
-  Elastic Email service.
-#2297777 by mike.davis: Text is not translatable.
-#2305277 by mike.davis: Update queue description to add link to Queue UI.
-
-
-Elastic Email 7.x-1.0, 2014-06-05
-==========================================
-
-Initial release for Drupal 7.x
+Initial release to Drupal 8 version
