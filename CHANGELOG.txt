@@ -5,7 +5,10 @@ Elastic Email 8.x-x.x, xxxx-xx-xx
 
 Elastic Email 8.x-2.0-beta3, xxxx-xx-xx
 ------------------------------
-Issue #2545102 by mike.davis: Undefined property: stdClass::$data error when no connection
+Issue #2615132 by mike.davis: Update validation of whether account settings have
+  been set
+Issue #2545102 by mike.davis: Undefined property: stdClass::$data error when no
+  connection
 
 
 Elastic Email 8.x-2.0-beta2, 2016-04-06

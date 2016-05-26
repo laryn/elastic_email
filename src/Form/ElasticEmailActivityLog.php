@@ -30,11 +30,6 @@ class ElasticEmailActivityLog extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    /*if (!_elastic_email_has_valid_settings()) {
-      drupal_set_message(t('You need to configure your Elastic Email settings.'), 'error');
-      return $form;
-    }*/
-
     global $base_url;
 
     $config = \Drupal::config('elastic_email.settings');

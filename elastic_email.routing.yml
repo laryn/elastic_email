@@ -11,6 +11,7 @@ elastic_email.activity_log:
     _title: 'Activity Log'
     _form: \Drupal\elastic_email\Form\ElasticEmailActivityLog
   requirements:
+    _access_check_valid_settings: 'TRUE'
     _permission: 'administer site configuration'
 elastic_email.admin_settings:
   path: /admin/config/system/elastic_email/settings
@@ -25,4 +26,5 @@ elastic_email.send_test:
     _title: 'Test Email'
     _form: \Drupal\elastic_email\Form\ElasticEmailSendTest
   requirements:
+    _access_check_valid_settings: 'TRUE'
     _permission: 'administer site configuration'

@@ -28,11 +28,6 @@ class ElasticEmailSendTest extends FormBase {
    * @return array
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    /*if (!_elastic_email_has_valid_settings()) {
-      drupal_set_message(t('You need to configure your Elastic Email settings.'), 'error');
-      return $form;
-    }*/
-
     $form['elastic_email_test_email_to'] = [
       '#type' => 'textfield',
       '#size' => 40,
