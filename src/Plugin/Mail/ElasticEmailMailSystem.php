@@ -10,6 +10,12 @@ use Drupal\Component\Utility\Html;
  * @Mail(
  *   id = "elastic_email_mail",
  *   label = @Translation("Elastic Email Mailer"),
+ *   label_singular = @Translation("Elastic Email Mailer")
+ *   label_plural = @Translation("Elastic Email Mailers")
+ *   label_count = @PluralTranslation(
+ *     singular = @Translation("elastic email mailer")
+ *     plural = @Translation("elastic email mailers")
+ *   ),
  *   description = @Translation("Sends emails via Elastic Email.")
  * )
  */
