@@ -3,9 +3,14 @@ Elastic Email 7.x-x.x, xxxx-xx-xx
 ------------------------------
 
 
-Elastic Email 7.x-2.1, xxxx-xx-xx
+Elastic Email 7.x-2.2, xxxx-xx-xx
 ------------------------------
-Issue #2678936 by mike.davis: Hide the test tab if settings invalid 
+Issue #2617206 by mike.davis: Is the 'low credit threshold' still valid
+
+
+Elastic Email 7.x-2.1, 2016-07-06
+------------------------------
+Issue #2678936 by mike.davis: Hide the test tab if settings invalid
 Issue #2733667 by mike.davis: Dependancy on Date
 Issue #2657784 by mike.davis: Update variable name $s_html
 
