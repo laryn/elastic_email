@@ -1,7 +1,4 @@
-<?php /**
- * @file
- * Contains \Drupal\elastic_email\EventSubscriber\InitSubscriber.
- */
+<?php 
 
 namespace Drupal\elastic_email\EventSubscriber;
 

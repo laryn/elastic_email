@@ -1,7 +1,4 @@
-<?php /**
- * @file
- * Contains \Drupal\elastic_email\Controller\DefaultController.
- */
+<?php 
 
 namespace Drupal\elastic_email\Controller;
 

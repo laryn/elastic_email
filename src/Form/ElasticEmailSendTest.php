@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\elastic_email\Form\ElasticEmailSendTest.
- */
-
 namespace Drupal\elastic_email\Form;
 
 use Drupal\Core\Form\FormBase;

@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\elastic_email\Access\ValidateSettings.
- */
 
 namespace Drupal\elastic_email\Access;
 
