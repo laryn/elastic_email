@@ -114,7 +114,7 @@ class ElasticEmailSettingsForm extends ConfigFormBase {
       '#type' => 'textfield',
       '#size' => 8,
       '#title' => t('Low Credit Threshold (USD)'),
-      '#description' => t('Sets the lower threshold limit value of when to warn admin users about a low credit limit.'),
+      '#description' => t('Sets the lower threshold limit value of when to warn admin users about a low credit limit.') . '<br />' . t('(NOTE: If you are not sending out more than the Elastic Email monthly limit of 25,000 emails, set this value to zero to not show any warning).'),
       '#default_value' => $config->get('credit_low_threshold'),
     ];
 
