@@ -13,6 +13,7 @@ Issue #2743471 by mike.davis, pashupathi nath gajawada: Adding plural labels to 
 Issue #2796267 by mike.davis: Add dependancy on mailsystem module
 Issue #2774331 by aks22: Remove @file tag docblock from all the .php files
 Issue #2617206 by mike.davis: Is the 'low credit threshold' still valid
+Issue #2796723 by mike.davis: Duplicate dashboard text
 
 
 Elastic Email 8.x-2.0-beta2, 2016-04-06
