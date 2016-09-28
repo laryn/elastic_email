@@ -3,7 +3,11 @@ Elastic Email 8.x-x.x, xxxx-xx-xx
 ------------------------------
 
 
-Elastic Email 8.x-2.0-beta3, xxxx-xx-xx
+Elastic Email 8.x-2.0-beta4, xxxx-xx-xx
+------------------------------
+
+
+Elastic Email 8.x-2.0-beta3, 2016-09-28
 ------------------------------
 Issue #2615132 by mike.davis: Update validation of whether account settings have
   been set
