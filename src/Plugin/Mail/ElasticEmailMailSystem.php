@@ -59,12 +59,12 @@ class ElasticEmailMailSystem implements MailInterface {
 
       \Drupal::logger('elastic_email_queue')->info('Message added to the Queue - no. of messages: ' . $queue->numberOfItems(), []);
 
-      return t('Email message queued for delivery via Elastic Email at cron time.');
+      return $this->t('Email message queued for delivery via Elastic Email at cron time.');
     }
     else {
       // Otherwise send the message directly.
       $this->send($message);
-      return t('Queuing unavailable. Email sent directly via Elastic Email.');
+      return $this->t('Queuing unavailable. Email sent directly via Elastic Email.');
     }
   }
 
@@ -113,7 +113,7 @@ class ElasticEmailMailSystem implements MailInterface {
    * @return array
    *   Returns an array with either a 'success' or 'error' elements. See main
    *   function description for details. Note that the error message text will
-   *   have already been passed through t().
+   *   have already been passed through $this->t().
    *
    * @todo Provide support for HTML-based email and attachments?
    */
@@ -129,10 +129,10 @@ class ElasticEmailMailSystem implements MailInterface {
 
     $result = array();
     if (empty($username) || empty($api_key)) {
-      $result['error'] = t('Unable to send email to Elastic Email because username or API key not specified.');
+      $result['error'] = $this->t('Unable to send email to Elastic Email because username or API key not specified.');
     }
     elseif (empty($from) || empty($to) || (empty($subject) && empty($body_text))) {
-      $result['error'] = t('Unable to send email because some required email parameters are empty.');
+      $result['error'] = $this->t('Unable to send email because some required email parameters are empty.');
     }
 
     if (!isset($result['error'])) {
@@ -170,14 +170,14 @@ class ElasticEmailMailSystem implements MailInterface {
       $response = Html::escape(@stream_get_contents($fp));
 
       if (empty($response)) {
-        $result['error'] = t('Error: no response (or empty response) received from Elastic Email service.');
+        $result['error'] = $this->t('Error: no response (or empty response) received from Elastic Email service.');
       }
       elseif (!preg_match('/[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}/', $response)) {
         $result['error'] = $response;
       }
       else {
         // Message was successfully delivered.
-        $result['success']['msg'] = t('Success [@tx_id]; message sent to: @recipients',
+        $result['success']['msg'] = $this->t('Success [@tx_id]; message sent to: @recipients',
           array('@tx_id' => $response, '@recipients' => $to));
 
         $result['success']['tx_id'] = $response;

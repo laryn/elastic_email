@@ -26,8 +26,8 @@ class ElasticEmailSendTest extends FormBase {
     $form['elastic_email_test_email_to'] = [
       '#type' => 'textfield',
       '#size' => 40,
-      '#title' => t('Email address to send a test email to'),
-      '#description' => t('Enter the email address that you would like to send a test email to.'),
+      '#title' => $this->t('Email address to send a test email to'),
+      '#description' => $this->t('Enter the email address that you would like to send a test email to.'),
       '#required' => TRUE,
       '#default_value' => \Drupal::config('system.site')->get('mail'),
     ];
@@ -35,27 +35,29 @@ class ElasticEmailSendTest extends FormBase {
     $form['elastic_email_test_email_subject'] = [
       '#type' => 'textfield',
       '#size' => 100,
-      '#title' => t('Test Email Subject'),
-      '#description' => t('Enter the subject that you would like to send with the test email.'),
+      '#title' => $this->t('Test Email Subject'),
+      '#description' => $this->t('Enter the subject that you would like to send with the test email.'),
       '#required' => TRUE,
-      '#default_value' => t('Elastic Email module: configuration test email'),
+      '#default_value' => $this->t('Elastic Email module: configuration test email'),
     ];
 
-    $text_body = t('This is a test of the Drupal Elastic Email module configuration.') . "\n\n" . t('Message generated: @time', [
-      '@time' => \Drupal::service('date.formatter')->format(REQUEST_TIME, 'custom', 'r')
+    $text_body = $this->t('This is a test of the Drupal Elastic Email module configuration.') .
+      "\n\n" .
+      $this->t('Message generated: @time', [
+        '@time' => \Drupal::service('date.formatter')->format(REQUEST_TIME, 'custom', 'r')
       ]);
 
     $form['elastic_email_test_email_body'] = [
       '#type' => 'textarea',
-      '#title' => t('Test email body contents'),
-      '#description' => t('Enter the email body that you would like to send.'),
+      '#title' => $this->t('Test email body contents'),
+      '#description' => $this->t('Enter the email body that you would like to send.'),
       '#default_value' => $text_body,
     ];
 
     $form['elastic_email_test_email_html'] = [
       '#type' => 'checkbox',
-      '#title' => t('Send as HTML?'),
-      '#description' => t('Check this to send a test email as HTML.'),
+      '#title' => $this->t('Send as HTML?'),
+      '#description' => $this->t('Check this to send a test email as HTML.'),
       '#default_value' => FALSE,
     ];
 
@@ -93,14 +95,14 @@ class ElasticEmailSendTest extends FormBase {
 
     if (isset($result['error'])) {
       // There was an error. Return error HTML.
-      drupal_set_message(t('Failed to send a test email to %test_to. Got the following error: %error_msg', [
+      drupal_set_message($this->t('Failed to send a test email to %test_to. Got the following error: %error_msg', [
         '%test_to' => $to,
         '%error_msg' => $result['error'],
       ]), 'error');
     }
     else {
       // Success!
-      drupal_set_message(t('Successfully sent a test email to %test_to', [
+      drupal_set_message($this->t('Successfully sent a test email to %test_to', [
         '%test_to' => $to
         ]));
     }

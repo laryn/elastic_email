@@ -55,25 +55,25 @@ class ElasticEmailSettingsForm extends ConfigFormBase {
     // Fieldset to hold credential fields, and Test fieldset.
     $form['credentials'] = [
       '#type' => 'fieldset',
-      '#title' => t('API Credentials'),
+      '#title' => $this->t('API Credentials'),
     ];
 
     $form['credentials']['username'] = array(
       '#type' => 'textfield',
       '#size' => 48,
-      '#title' => t('API username'),
+      '#title' => $this->t('API username'),
       '#required' => TRUE,
       '#default_value' => $config->get('username'),
-      '#description' => t('This is typically your Elastic Email account email address.'),
+      '#description' => $this->t('This is typically your Elastic Email account email address.'),
     );
 
     $form['credentials']['api_key'] = array(
       '#type' => 'textfield',
       '#size' => 48,
-      '#title' => t('API Key'),
+      '#title' => $this->t('API Key'),
       '#required' => TRUE,
       '#default_value' => $config->get('api_key'),
-      '#description' => t('The API Key format is typically <tt>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</tt>.'),
+      '#description' => $this->t('The API Key format is typically') . ' <tt>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</tt>.',
     );
 
     // DIV to hold the results of the AJAX test call.
@@ -86,42 +86,44 @@ class ElasticEmailSettingsForm extends ConfigFormBase {
     // Fieldset for other options.
     $form['options'] = [
       '#type' => 'fieldset',
-      '#title' => t('Options'),
+      '#title' => $this->t('Options'),
     ];
 
     $form['options']['queue_enabled'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Queue outgoing messages'),
-      '#description' => t('When checked, outgoing messages will be queued via Drupal core system queue, and delivered when the queue is emptied at cron time. When unchecked, messages are delivered immediately (synchronously). Note that synchronous delivery can cause delay in page execution time.') .
-        '<br /><br />' . t('If enabled, you can use the <a href="@link" target="_blank">Queue UI</a> to view the queue.', array('@link' => 'https://www.drupal.org/project/queue_ui')),
+      '#title' => $this->t('Queue outgoing messages'),
+      '#description' => $this->t('When checked, outgoing messages will be queued via Drupal core system queue, and delivered when the queue is emptied at cron time. When unchecked, messages are delivered immediately (synchronously). Note that synchronous delivery can cause delay in page execution time.') .
+        '<br /><br />' . $this->t('If enabled, you can use the <a href="@link" target="_blank">Queue UI</a> to view the queue.', array('@link' => 'https://www.drupal.org/project/queue_ui')),
       '#default_value' => $config->get('queue_enabled'),
     );
 
     $form['options']['log_success'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Log message delivery success'),
-      '#description' => t('When checked, a log message will also be generated for <em>successful</em> email delivery. Errors are always logged.'),
+      '#title' => $this->t('Log message delivery success'),
+      '#description' => $this->t('When checked, a log message will also be generated for <em>successful</em> email delivery. Errors are always logged.'),
       '#default_value' => $config->get('log_success'),
     );
 
     // Fieldset for other settings.
     $form['settings'] = [
       '#type' => 'fieldset',
-      '#title' => t('Settings'),
+      '#title' => $this->t('Settings'),
     ];
 
     $form['settings']['credit_low_threshold'] = [
       '#type' => 'textfield',
       '#size' => 8,
-      '#title' => t('Low Credit Threshold (USD)'),
-      '#description' => t('Sets the lower threshold limit value of when to warn admin users about a low credit limit.') . '<br />' . t('(NOTE: If you are not sending out more than the Elastic Email monthly limit of 25,000 emails, set this value to zero to not show any warning).'),
+      '#title' => $this->t('Low Credit Threshold (USD)'),
+      '#description' => $this->t('Sets the lower threshold limit value of when to warn admin users about a low credit limit.') .
+        '<br />' .
+        $this->t('(NOTE: If you are not sending out more than the Elastic Email monthly limit of 25,000 emails, set this value to zero to not show any warning).'),
       '#default_value' => $config->get('credit_low_threshold'),
     ];
 
     $form['settings']['use_default_channel'] = [
       '#type' => 'checkbox',
-      '#title' => t('Use a Default Channel'),
-      '#description' => t('If no default channel is set, then the default (set by Elastic Email) is the sending email address.<br />Setting a default channel will add this value to every email that is sent, meaning that you can more easily identify email that has come from each specific site within the reporting section.'),
+      '#title' => $this->t('Use a Default Channel'),
+      '#description' => $this->t('If no default channel is set, then the default (set by Elastic Email) is the sending email address.<br />Setting a default channel will add this value to every email that is sent, meaning that you can more easily identify email that has come from each specific site within the reporting section.'),
       '#default_value' => $config->get('use_default_channel'),
     ];
 
@@ -135,7 +137,7 @@ class ElasticEmailSettingsForm extends ConfigFormBase {
       '#type' => 'textfield',
       '#size' => 48,
       '#maxlength' => 60,
-      '#title' => t('Default Channel'),
+      '#title' => $this->t('Default Channel'),
       '#default_value' => $default_channel,
       '#states' => [
         'visible' => [

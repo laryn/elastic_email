@@ -30,12 +30,12 @@ class ElasticEmailActivityLog extends FormBase {
     $config = \Drupal::config('elastic_email.settings');
 
     $form['text'] = [
-      '#markup' => t('The following log information only provides data from the last 30 days. For a full report on your emails, visit the <a href="https://elasticemail.com/account">Elastic Email</a> main dashboard.')
+      '#markup' => $this->t('The following log information only provides data from the last 30 days. For a full report on your emails, visit the <a href="https://elasticemail.com/account">Elastic Email</a> main dashboard.')
     ];
 
     $form['search'] = [
       '#type' => 'fieldset',
-      '#title' => t('Search Options'),
+      '#title' => $this->t('Search Options'),
       '#attributes' => [
         'class' => [
           'container-inline',
@@ -47,7 +47,7 @@ class ElasticEmailActivityLog extends FormBase {
     // @todo set constants for these.
     $form['search']['status'] = [
       '#type' => 'select',
-      '#title' => t('Email Status'),
+      '#title' => $this->t('Email Status'),
       '#options' => [
         0 => 'All',
         1 => 'Ready To Send',
@@ -71,7 +71,7 @@ class ElasticEmailActivityLog extends FormBase {
 
     $form['search']['channel'] = [
       '#type' => 'select',
-      '#title' => t('Select the Channel'),
+      '#title' => $this->t('Select the Channel'),
       '#options' => $channelList,
       '#default_value' => $defaultChannel,
     ];
@@ -84,7 +84,7 @@ class ElasticEmailActivityLog extends FormBase {
 
     $form['search']['date_from'] = [
       '#type' => 'date',
-      '#title' => t('Date From'),
+      '#title' => $this->t('Date From'),
       '#default_value' => $fromValue,
       '#date_format' => $dateFormat,
       '#date_label_position' => 'within',
@@ -95,7 +95,7 @@ class ElasticEmailActivityLog extends FormBase {
 
     $form['search']['date_to'] = [
       '#type' => 'date',
-      '#title' => t('Date To'),
+      '#title' => $this->t('Date To'),
       '#default_value' => $toValue,
       '#date_format' => $dateFormat,
       '#date_label_position' => 'within',
@@ -106,7 +106,7 @@ class ElasticEmailActivityLog extends FormBase {
 
     $form['search']['apply'] = [
       '#type' => 'button',
-      '#value' => t('Apply'),
+      '#value' => $this->t('Apply'),
       '#ajax' => [
         'callback' => [$this, 'activityLogTable'],
         'wrapper' => 'elastic-email-activity-log-results',
@@ -167,7 +167,7 @@ class ElasticEmailActivityLog extends FormBase {
       '#theme' => 'table',
       '#header' => $tableHeader,
       '#rows' => $activityData,
-      '#empty' => t('No records available.'),
+      '#empty' => $this->t('No records available.'),
     ];
 
     $output = '<div id="elastic-email-activity-log-results">' . render($table) . '</div>';
