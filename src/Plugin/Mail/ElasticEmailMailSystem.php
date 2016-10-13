@@ -3,6 +3,7 @@ namespace Drupal\elastic_email\Plugin\Mail;
 
 use Drupal\Core\Mail\MailInterface;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Modify the drupal mail system to use Elastic Email to send emails.
@@ -20,6 +21,7 @@ use Drupal\Component\Utility\Html;
  * )
  */
 class ElasticEmailMailSystem implements MailInterface {
+  use StringTranslationTrait;
 
   protected static $sendUrl = 'https://api.elasticemail.com/mailer/send';
 

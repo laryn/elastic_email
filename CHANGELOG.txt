@@ -3,8 +3,9 @@ Elastic Email 8.x-x.x, xxxx-xx-xx
 ------------------------------
 
 
-Elastic Email 8.x-2.0-beta4, xxxx-xx-xx
+Elastic Email 8.x-2.0-beta4, 2016-10-13
 ------------------------------
+Issue #2817713 by jurgenhaas: Call to undefined function t()
 
 
 Elastic Email 8.x-2.0-beta3, 2016-09-28
