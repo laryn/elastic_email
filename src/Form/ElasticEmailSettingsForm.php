@@ -18,23 +18,6 @@ class ElasticEmailSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
-    $config = $this->config('elastic_email.settings');
-    $config->set('username', $form['credentials']['username']['#value']);
-    $config->set('api_key', $form['credentials']['api_key']['#value']);
-    $config->set('queue_enabled', $form['options']['queue_enabled']['#value']);
-    $config->set('log_success', $form['options']['log_success']['#value']);
-    $config->set('credit_low_threshold', $form['settings']['credit_low_threshold']['#value']);
-    $config->set('use_default_channel', $form['settings']['use_default_channel']['#value']);
-    $config->set('default_channel', $form['settings']['default_channel']['#value']);
-    $config->save();
-
-    parent::submitForm($form, $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function getEditableConfigNames() {
     return ['elastic_email.settings'];
   }
@@ -42,7 +25,7 @@ class ElasticEmailSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state) {
     global $base_url;
 
     // Emails won't get sent if allow_url_fopen is disabled.
@@ -153,6 +136,23 @@ class ElasticEmailSettingsForm extends ConfigFormBase {
 
     // Return the form.
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    $this->config('elastic_email.settings')
+      ->set('username', $form_state->getValue('username'))
+      ->set('api_key', $form_state->getValue('api_key'))
+      ->set('queue_enabled', $form_state->getValue('queue_enabled'))
+      ->set('log_success', $form_state->getValue('log_success'))
+      ->set('credit_low_threshold', $form_state->getValue('credit_low_threshold'))
+      ->set('use_default_channel', $form_state->getValue('use_default_channel'))
+      ->set('default_channel', $form_state->getValue('default_channel'))
+      ->save();
+
+    parent::submitForm($form, $form_state);
   }
 
 }
