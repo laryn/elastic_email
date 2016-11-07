@@ -3,6 +3,11 @@ Elastic Email 8.x-x.x, xxxx-xx-xx
 ------------------------------
 
 
+Elastic Email 8.x-2.0, 2016-11-07
+------------------------------
+Issue #2825173 by mike.davis: Settings form doesn't use $form_state to get values
+
+
 Elastic Email 8.x-2.0-beta4, 2016-10-13
 ------------------------------
 Issue #2817713 by jurgenhaas: Call to undefined function t()
@@ -14,7 +19,8 @@ Issue #2615132 by mike.davis: Update validation of whether account settings have
   been set
 Issue #2545102 by mike.davis: Undefined property: stdClass::$data error when no
   connection
-Issue #2743471 by mike.davis, pashupathi nath gajawada: Adding plural labels to Elastic Email
+Issue #2743471 by mike.davis, pashupathi nath gajawada: Adding plural labels to
+  Elastic Email
 Issue #2796267 by mike.davis: Add dependancy on mailsystem module
 Issue #2774331 by aks22: Remove @file tag docblock from all the .php files
 Issue #2617206 by mike.davis: Is the 'low credit threshold' still valid
