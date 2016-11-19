@@ -13,6 +13,9 @@
 
 use Drupal\Core\Routing\RouteMatchInterface;
 
+$path = drupal_get_path('module', 'elastic_email');
+require_once $path . '/lib/ElasticEmailClient.php';
+
 /**
  * Implements hook_help().
  */

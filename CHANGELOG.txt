@@ -3,6 +3,12 @@ Elastic Email 8.x-x.x, xxxx-xx-xx
 ------------------------------
 
 
+Elastic Email 8.x-3.0-beta1, xxxx-xx-xx
+------------------------------
+Issue #2829047 by mike.davis: API v2 Support : add the Elastic Email Client
+  library
+
+
 Elastic Email 8.x-2.0, 2016-11-07
 ------------------------------
 Issue #2825173 by mike.davis: Settings form doesn't use $form_state to get values
