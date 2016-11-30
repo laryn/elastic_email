@@ -2,6 +2,8 @@
 
 namespace Drupal\elastic_email\Form;
 
+use ApiTypes\Log;
+use ApiTypes\Recipient;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Datetime\DateFormatter;
@@ -158,10 +160,17 @@ class ElasticEmailActivityLog extends FormBase {
     ];
 
     $activityData = [];
-    foreach ($data as $row) {
-      // Remove message, bounce cat., msg-id, trans-id columns from the data.
-      unset($row[4], $row[5], $row[6], $row[7]);
-      $activityData[] = $row;
+    if (!is_array($data)) {
+      foreach ($data->recipients as $row) {
+        /** @var Recipient $row */
+        $activityData[] = [
+          $row->to,
+          $row->status,
+          $row->channel,
+          $row->date,
+          $row->subject,
+        ];
+      }
     }
 
     $table = [
@@ -221,14 +230,14 @@ class ElasticEmailActivityLog extends FormBase {
    *   The formatted date.
    */
   protected function formatDate($date_field) {
-    return date('m/d/Y H:i:s', strtotime($date_field));
+    return date('Y-m-d\TH:i:s', strtotime($date_field));
   }
 
   /**
    * Get the activity log data from Elastic Email API.
    *
    * @param string $status
-   *   The status of t
+   *   The status of the emails.
    * @param string $channel
    *   The channel the the email was sent by.
    * @param string $fromDate
@@ -236,7 +245,7 @@ class ElasticEmailActivityLog extends FormBase {
    * @param string $toDate
    *   The to date for retrieving data.
    *
-   * @return array
+   * @return Log | array
    *   The log data from Elastic Email.
    */
   protected function getActivityDate($status, $channel, $fromDate, $toDate) {
@@ -244,12 +253,12 @@ class ElasticEmailActivityLog extends FormBase {
       $fromDate = $this->formatDate($fromDate);
       $toDate = $this->formatDate($toDate);
 
-      /** @var ElasticEmailApiActivityLog $activityLog */
-      $activityLog = \Drupal::service('elastic_email.api.activity_log');
-      $activityLog->setParams($status, $channel, $fromDate, $toDate);
-      return $activityLog->makeRequest(FALSE);
+      /** @var ElasticEmailManager $service */
+      $service = \Drupal::service('elastic_email.api');
+      $activityLog = $service->getLog()->Load([$status], $fromDate, $toDate, $channel);
+      return $activityLog;
     }
-    catch (ElasticEmailException $e) {
+    catch (ApiException $e) {
       return [$e->getMessage()];
     }
   }

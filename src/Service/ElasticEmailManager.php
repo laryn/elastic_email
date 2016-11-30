@@ -5,6 +5,7 @@ namespace Drupal\elastic_email\Service;
 use ElasticEmailClient\Account;
 use ElasticEmailClient\ApiClient;
 use ElasticEmailClient\Channel;
+use ElasticEmailClient\Log;
 
 class ElasticEmailManager {
 
@@ -25,6 +26,13 @@ class ElasticEmailManager {
    */
   public function getChannel() {
     return new Channel();
+  }
+
+  /**
+   * @return \ElasticEmailClient\Log
+   */
+  public function getLog() {
+    return new Log();
   }
 
 }

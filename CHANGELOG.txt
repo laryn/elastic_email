@@ -9,6 +9,7 @@ Issue #2829047 by mike.davis: API v2 Support : add the Elastic Email Client
   library
 Issue #2789349 by mike.davis: API v2 Support : account info
 Issue #2789353 by mike.davis: API v2 Support : channel list
+Issue #2789351 by mike.davis: API v2 Support : activity log
 
 
 Elastic Email 8.x-2.0, 2016-11-07
