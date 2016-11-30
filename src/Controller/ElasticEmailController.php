@@ -1,12 +1,12 @@
-<?php 
+<?php
 
 namespace Drupal\elastic_email\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
-use Drupal\elastic_email\Api\ElasticEmailApiAccountDetails;
-use Drupal\elastic_email\Api\ElasticEmailException;
+use Drupal\elastic_email\Service\ElasticEmailManager;
+use ElasticEmailClient\ApiException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
@@ -16,13 +16,13 @@ class ElasticEmailController extends ControllerBase {
 
   public function dashboard() {
     try {
-      /** @var ElasticEmailApiAccountDetails $service */
-      $service = \Drupal::service('elastic_email.api.account_details');
-      $data = $service->makeRequest(FALSE);
+      /** @var ElasticEmailManager $service */
+      $service = \Drupal::service('elastic_email.api');
+      $accountData = (array) $service->getAccount()->Load();
 
       $build = [
         '#theme' => 'elastic_email_dashboard',
-        '#data' => $data,
+        '#data' => $accountData,
         '#attached' => [
           'library' => ['elastic_email/admin'],
         ],
@@ -30,7 +30,7 @@ class ElasticEmailController extends ControllerBase {
 
       return $build;
     }
-    catch (ElasticEmailException $e) {
+    catch (ApiException $e) {
       $route = Url::fromRoute('elastic_email.admin_settings');
       $params = [
         '%settings' => Link::fromTextAndUrl('settings', $route)->toString(),

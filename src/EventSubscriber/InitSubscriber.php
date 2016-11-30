@@ -1,9 +1,9 @@
-<?php 
+<?php
 
 namespace Drupal\elastic_email\EventSubscriber;
 
-use Drupal\elastic_email\Api\ElasticEmailApiAccountDetails;
-use Drupal\elastic_email\Api\ElasticEmailException;
+use Drupal\elastic_email\Service\ElasticEmailManager;
+use ElasticEmailClient\ApiException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -23,9 +23,9 @@ class InitSubscriber implements EventSubscriberInterface {
     }
 
     try {
-      /** @var ElasticEmailApiAccountDetails $service */
-      $service = \Drupal::service('elastic_email.api.account_details');
-      $accountData = $service->makeRequest();
+      /** @var ElasticEmailManager $service */
+      $service = \Drupal::service('elastic_email.api');
+      $accountData = (array) $service->getAccount()->Load();
 
       $creditLowThreshold = \Drupal::config('elastic_email.settings')->get('credit_low_threshold');
       if ($accountData['credit'] <= $creditLowThreshold) {
@@ -35,7 +35,7 @@ class InitSubscriber implements EventSubscriberInterface {
         ]), 'warning', FALSE);
       }
     }
-    catch (ElasticEmailException $e) {
+    catch (ApiException $e) {
     }
   }
 
