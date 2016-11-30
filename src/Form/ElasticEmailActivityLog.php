@@ -9,8 +9,9 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\elastic_email\Api\ElasticEmailApiActivityLog;
-use Drupal\elastic_email\Api\ElasticEmailApiChannelList;
 use Drupal\elastic_email\Api\ElasticEmailException;
+use Drupal\elastic_email\Service\ElasticEmailManager;
+use ElasticEmailClient\ApiException;
 
 class ElasticEmailActivityLog extends FormBase {
 
@@ -195,11 +196,16 @@ class ElasticEmailActivityLog extends FormBase {
    */
   protected function getChannelList() {
     try {
-      /** @var ElasticEmailApiChannelList $channelList */
-      $channelList = \Drupal::service('elastic_email.api.channel_list');
-      return $channelList->makeRequest();
+      /** @var ElasticEmailManager $service */
+      $service = \Drupal::service('elastic_email.api');
+      $channelList = $service->getChannel()->EEList();
+      $data = [];
+      foreach ($channelList as $channel) {
+        $data[$channel->name] = $channel->name;
+      }
+      return $data;
     }
-    catch (ElasticEmailException $e) {
+    catch (ApiException $e) {
       drupal_set_message($e->getMessage(), 'error');
       return [];
     }
