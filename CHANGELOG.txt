@@ -7,7 +7,7 @@ Elastic Email 8.x-3.0-beta1, xxxx-xx-xx
 ------------------------------
 Issue #2829047 by mike.davis: API v2 Support : add the Elastic Email Client
   library
-Issue #2789345 by mike.davis: API v2 Support : sending email
+Issue #2789349 by mike.davis: API v2 Support : account info
 
 
 Elastic Email 8.x-2.0, 2016-11-07
