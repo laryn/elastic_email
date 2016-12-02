@@ -11,6 +11,7 @@ Issue #2789349 by mike.davis: API v2 Support : account info
 Issue #2789353 by mike.davis: API v2 Support : channel list
 Issue #2789351 by mike.davis: API v2 Support : activity log
 Issue #2832448 by mike.davis: API v2 Support : remove old classes
+Issue #2831867 by cebasqueira: Update the README.txt in line with the module page
 
 
 Elastic Email 8.x-2.0, 2016-11-07

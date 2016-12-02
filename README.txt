@@ -8,15 +8,16 @@ and can optionally queue messages for delivery at cron time.
 
 Elastic Email is a mail relay service. That is, instead of your website
 sending mail via its own SMTP server, outgoing email is directed through the
-Elastic Email service and out onto the internet. Learn more at:
+Elastic Email service and out onto the internet.
+This module provides plug n' play integration with the Elastic Email service.
+Learn more at the:
 
-    http://elasticemail.com
-
+  http://elasticemail.com
 
 
  Why?
 ==========================================
-Elastic Email is of particular use to cloud-hosted websites. There are two
+Elastic Email is of particular use to cloud-hosted websites. There are three
 very prominent reasons to use it:
 
  - Some cloud services (or rather, their IP address ranges) are blacklisted by
@@ -27,14 +28,11 @@ very prominent reasons to use it:
    simply be unable to use SMTP. Elastic Email uses a REST-style API over HTTPS.
    So, all you need open is port 443, the standard HTTPS port.
 
-But the main reason may be:
-
-- You can be up and running in less than 5 minutes total.
-  Really.
-  You can even get an account that lets you send 1000 emails before you need to
-  pay up. And there's no need to mess with configuring sendmail or postfix on
-  your server: all configuration is done from one simple Drupal admin screen.
-
+But the main reason may be that you can be up and running in less than
+5 minutes total. Really. You can even get an account that lets you send 150,000
+emails a month before you need to start paying. And there's no need to mess with
+configuring sendmail or postfix on your server: all configuration is done from
+one simple Drupal admin screen.
 
 
  How?
@@ -49,13 +47,20 @@ It's a three-step process:
 
 And you're done. But, if you need a little more detail:
 
+ 1. Sign up for an Elastic Email account, by going to http://elasticemail.com
+    and click on "Sign up" in the top right hand corner.
+ 2. Once signed up, make a note of your API Key and your Elastic Email username
+    (aka your email address), which you will need to configure the module
+ 3. Install and enable the elastic_email module
+ 4. Configure the elastic_email module with the username and API Key
+
+And you're done.
 
 
  1. Sign up
 =========================================
 Go to http://elasticemail.com, click on "Get your API Key". Save the API Key
 somewhere safe.
-
 
 
  2. Install & Enable
@@ -70,7 +75,6 @@ Then, go to your Drupal module admin screen which you'll find at:
 
 Enable the 'elastic_email' module (it's under the 'Mail' category) and click
 'Save configuration'.
-
 
 
  3. Configure
@@ -88,7 +92,6 @@ Then:
 Drupal should now be sending email via Elastic Email.
 
 
-
  Other configuration options
 =========================================
 There are two other options you can set:
@@ -104,7 +107,6 @@ There are two other options you can set:
    the log messages at: YOUR_SITE/admin/reports/dblog
 
 
-
  Notes
 =========================================
  - Remember that your 'username' is the email address you used when you created
@@ -118,14 +120,19 @@ There are two other options you can set:
    module implements DrupalMailSystem. Only one module can provide this
    function, so this module may not be compatible with other mail-related
    modules. Disable these other mail-related modules to use this module.
+ - The config screen has a handy "Test" function to check that you're correctly
+   configured.
+ - This module does not currently support sending attachments.
+ - You should setup a Sender Policy Framework (SPF) record for your domain to
+   authorise Elastic Email to send email on your behalf. See:
 
+   http://elasticemail.com/api-documentation/sender-policy-framework
 
 
  Known issues
 =========================================
  - Does not support sending with attachments.
  - Hasn't been tested with non-ASCII text.
-
 
 
  Acknowledgements & other stuff
