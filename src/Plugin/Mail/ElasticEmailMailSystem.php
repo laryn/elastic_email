@@ -2,8 +2,9 @@
 namespace Drupal\elastic_email\Plugin\Mail;
 
 use Drupal\Core\Mail\MailInterface;
-use Drupal\Component\Utility\Html;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\elastic_email\Service\ElasticEmailManager;
+use ElasticEmailClient\ApiException;
 
 /**
  * Modify the drupal mail system to use Elastic Email to send emails.
@@ -22,8 +23,6 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
  */
 class ElasticEmailMailSystem implements MailInterface {
   use StringTranslationTrait;
-
-  protected static $sendUrl = 'https://api.elasticemail.com/mailer/send';
 
   /**
    * Concatenate and wrap the e-mail body for either plain-text or HTML emails.
@@ -105,12 +104,6 @@ class ElasticEmailMailSystem implements MailInterface {
    *   The plain-text body of the message.
    * @param string $body_html
    *   The html-text body of the message.
-   * @param string $username
-   *   (optional) The Elastic Email account username (typically the account email
-   *   address). If not provided, the value from the module configuration is used.
-   * @param string $api_key
-   *   (optional) The Elastic Email account API key. If not provided, the value
-   *   from the module configuration is used.
    *
    * @return array
    *   Returns an array with either a 'success' or 'error' elements. See main
@@ -119,15 +112,10 @@ class ElasticEmailMailSystem implements MailInterface {
    *
    * @todo Provide support for HTML-based email and attachments?
    */
-  public function elasticEmailSend($from, $from_name = NULL, $to, $subject = '', $body_text = NULL, $body_html = NULL, $username = NULL, $api_key = NULL) {
-    // If no username provided, get it from the module configuration.
-    if (!$username) {
-      $username = \Drupal::config('elastic_email.settings')->get('username');
-    }
-    // If no API Key provided, get it from the module configuration.
-    if (!$api_key) {
-      $api_key = \Drupal::config('elastic_email.settings')->get('api_key');
-    }
+  public function elasticEmailSend($from, $from_name = NULL, $to, $subject = '', $body_text = NULL, $body_html = NULL) {
+    $config = \Drupal::config('elastic_email.settings');
+    $username = $config->get('username');
+    $api_key = $config->get('api_key');
 
     $result = array();
     if (empty($username) || empty($api_key)) {
@@ -137,54 +125,53 @@ class ElasticEmailMailSystem implements MailInterface {
       $result['error'] = $this->t('Unable to send email because some required email parameters are empty.');
     }
 
-    if (!isset($result['error'])) {
-      // It's necessary to urlencode() each of the data values.
-      $data = 'username=' . urlencode($username);
-      $data .= '&api_key=' . urlencode($api_key);
-      $data .= '&from=' . urlencode($from);
-      $data .= '&reply_to=' . urlencode($from);
+    if (isset($result['error'])) {
+      return $result;
+    }
 
-      if (!empty($from_name)) {
-        $data .= '&from_name=' . urlencode($from_name);
-        $data .= '&reply_to_name=' . urlencode($from_name);
+    try {
+      $defaultChannel = NULL;
+      if ($config->get('use_default_channel')) {
+        $defaultChannel = $config->get('default_channel');
       }
 
-      $data .= '&to=' . urlencode($to);
-      $data .= '&subject=' . urlencode($subject);
+      $to = explode(';', $to);
 
-      if (!empty($body_text)) {
-        $data .= '&body_text=' . urlencode($body_text);
-      }
-      if (!empty($body_html)) {
-        $data .= '&body_html=' . urlencode($body_html);
-      }
+      /** @var ElasticEmailManager $service */
+      $service = \Drupal::service('elastic_email.api');
+      $response = $service->getEmail()->Send(
+        $subject,
+        $from, $from_name,
+        NULL, NULL,
+        NULL, NULL,
+        $from, $from_name,
+        $to, $to, [], [],
+        [], [], NULL,
+        $defaultChannel,
+        (!empty($body_html) ? $body_html : NULL),
+        (!empty($body_text) ? $body_text : NULL)
+      );
+    }
+    catch (ApiException $e) {
+      drupal_set_message($e->getMessage(), 'error');
+    }
 
-      if (\Drupal::config('elastic_email.settings')->get('use_default_channel')) {
-        $data .= '&channel=' . \Drupal::config('elastic_email.settings')->get('default_channel');
-      }
+    if (empty($response)) {
+      $result['error'] = $this->t('Error: no response (or empty response) received from Elastic Email service.');
+    }
+    elseif (!preg_match('/[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}/', $response->transactionid)) {
+      $result['error'] = 'error message'; //$response;
+    }
+    else {
+      // Message was successfully delivered.
+      $result['success']['msg'] = $this->t('Success [@tx_id]; message sent to: @recipients',
+        [
+          '@tx_id' => $response->transactionid,
+          '@recipients' => $to
+        ]);
 
-      $ctx = stream_context_create(array(
-        'http' => array('method' => 'post', 'content' => $data)
-      ));
-      $fp = @fopen(self::$sendUrl, 'rb', FALSE, $ctx);
-
-      // The response should be safe, but call check_plain() for paranoia's sake.
-      $response = Html::escape(@stream_get_contents($fp));
-
-      if (empty($response)) {
-        $result['error'] = $this->t('Error: no response (or empty response) received from Elastic Email service.');
-      }
-      elseif (!preg_match('/[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}/', $response)) {
-        $result['error'] = $response;
-      }
-      else {
-        // Message was successfully delivered.
-        $result['success']['msg'] = $this->t('Success [@tx_id]; message sent to: @recipients',
-          array('@tx_id' => $response, '@recipients' => $to));
-
-        $result['success']['tx_id'] = $response;
-        $result['success']['recipients'] = $to;
-      }
+      $result['success']['tx_id'] = $response->transactionid;
+      $result['success']['recipients'] = $to;
     }
 
     return $result;

@@ -10,8 +10,6 @@ use Drupal\Core\Datetime\DateFormatter;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
-use Drupal\elastic_email\Api\ElasticEmailApiActivityLog;
-use Drupal\elastic_email\Api\ElasticEmailException;
 use Drupal\elastic_email\Service\ElasticEmailManager;
 use ElasticEmailClient\ApiException;
 

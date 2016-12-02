@@ -75,8 +75,6 @@ class ElasticEmailSendTest extends FormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $site_mail = \Drupal::config('system.site')->get('mail');
-    $username = \Drupal::config('elastic_email.settings')->get('username');
-    $api_key  = \Drupal::config('elastic_email.settings')->get('api_key');
 
     $to = $form_state->getValue(['elastic_email_test_email_to']);
     $subject = $form_state->getValue(['elastic_email_test_email_subject']);
@@ -91,7 +89,7 @@ class ElasticEmailSendTest extends FormBase {
     }
 
     $mail = new ElasticEmailMailSystem();
-    $result = $mail->elasticEmailSend($site_mail, NULL, $to, $subject, $text_body, $html_body, $username, $api_key);
+    $result = $mail->elasticEmailSend($site_mail, NULL, $to, $subject, $text_body, $html_body);
 
     if (isset($result['error'])) {
       // There was an error. Return error HTML.
