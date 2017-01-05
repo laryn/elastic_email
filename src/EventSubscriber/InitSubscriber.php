@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Drupal\elastic_email\EventSubscriber;
 
@@ -28,7 +28,7 @@ class InitSubscriber implements EventSubscriberInterface {
       $accountData = $service->makeRequest();
 
       $creditLowThreshold = \Drupal::config('elastic_email.settings')->get('credit_low_threshold');
-      if ($accountData['credit'] <= $creditLowThreshold) {
+      if (!empty($creditLowThreshold) && $accountData['credit'] <= $creditLowThreshold) {
         drupal_set_message(t('Your Elastic Email credit is getting low - currently at %credit %currency', [
           '%credit' => $accountData['credit'],
           '%currency' => $accountData['currency'],
