@@ -3,7 +3,7 @@ Elastic Email 8.x-x.x, xxxx-xx-xx
 ------------------------------
 
 
-Elastic Email 8.x-3.0-beta1, xxxx-xx-xx
+Elastic Email 8.x-3.0-beta1, 2017-03-29
 ------------------------------
 Issue #2829047 by mike.davis: API v2 Support : add the Elastic Email Client
   library
