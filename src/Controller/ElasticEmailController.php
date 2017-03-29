@@ -31,11 +31,7 @@ class ElasticEmailController extends ControllerBase {
       return $build;
     }
     catch (ApiException $e) {
-      $route = Url::fromRoute('elastic_email.admin_settings');
-      $params = [
-        '%settings' => Link::fromTextAndUrl('settings', $route)->toString(),
-      ];
-      drupal_set_message(t('You need to configure your Elastic Email %settings.', $params), 'error');
+      drupal_set_message(t('You need to configure your Elastic Email before you can continue to use this module.'), 'error');
       return new RedirectResponse(Url::fromRoute('elastic_email.admin_settings')->toString());
     }
   }
