@@ -126,9 +126,46 @@ class ElasticEmailSettingsForm extends ConfigFormBase {
         'visible' => [
           ':input[name="use_default_channel"]' => [
             'checked' => TRUE
-            ]
           ]
-        ],
+        ]
+      ],
+    ];
+
+    $form['settings']['use_reply_to'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Use a Specific Reply To'),
+      '#description' => $this->t('If no specific "reply to" is set, then the default (set by Elastic Email) is the sending email address.'),
+      '#default_value' => $config->get('use_reply_to'),
+    ];
+
+    $form['settings']['reply_to_email'] = [
+      '#type' => 'textfield',
+      '#size' => 48,
+      '#title' => $this->t('Reply To Email Address'),
+      '#description' => $this->t('Sets the email address that will be used when a user clicks "reply to" from any email sent from this site.'),
+      '#default_value' => $config->get('reply_to_email'),
+      '#states' => [
+        'visible' => [
+          ':input[name="use_reply_to"]' => [
+            'checked' => TRUE
+          ]
+        ]
+      ],
+    ];
+
+    $form['settings']['reply_to_name'] = [
+      '#type' => 'textfield',
+      '#size' => 48,
+      '#title' => $this->t('Reply To Email Name'),
+      '#description' => $this->t('Sets the name of the user that will be used when a user clicks "reply to" from any email sent from this site.'),
+      '#default_value' => $config->get('reply_to_name'),
+      '#states' => [
+        'visible' => [
+          ':input[name="use_reply_to"]' => [
+            'checked' => TRUE
+          ]
+        ]
+      ],
     ];
 
     // Add the normal settings form stuff.
@@ -150,6 +187,9 @@ class ElasticEmailSettingsForm extends ConfigFormBase {
       ->set('credit_low_threshold', $form_state->getValue('credit_low_threshold'))
       ->set('use_default_channel', $form_state->getValue('use_default_channel'))
       ->set('default_channel', $form_state->getValue('default_channel'))
+      ->set('use_reply_to', $form_state->getValue('use_reply_to'))
+      ->set('reply_to_email', $form_state->getValue('reply_to_email'))
+      ->set('reply_to_name', $form_state->getValue('reply_to_name'))
       ->save();
 
     parent::submitForm($form, $form_state);

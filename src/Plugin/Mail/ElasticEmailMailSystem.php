@@ -129,6 +129,11 @@ class ElasticEmailMailSystem implements MailInterface {
       return $result;
     }
 
+    // Set the reply to if enabled.
+    $use_reply_to = $config->get('use_reply_to');
+    $reply_to = ($use_reply_to) ? $config->get('reply_to_email') : NULL;
+    $reply_to_name = ($use_reply_to) ? $config->get('reply_to_name') : NULL;
+
     try {
       $defaultChannel = NULL;
       if ($config->get('use_default_channel')) {
@@ -144,7 +149,7 @@ class ElasticEmailMailSystem implements MailInterface {
         $from, $from_name,
         NULL, NULL,
         NULL, NULL,
-        $from, $from_name,
+        $reply_to, $reply_to_name,
         $to, $to, [], [],
         [], [], NULL,
         $defaultChannel,

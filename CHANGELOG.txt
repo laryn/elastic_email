@@ -13,6 +13,7 @@ Issue #2789351 by mike.davis: API v2 Support : activity log
 Issue #2832448 by mike.davis: API v2 Support : remove old classes
 Issue #2831867 by cebasqueira: Update the README.txt in line with the module page
 Issue #2865181 by mike.davis: Remove the link to the settings in the error message
+Issue #2363167 by mike.davis: set default reply to name & email
 
 
 Elastic Email 8.x-2.0, 2016-11-07
