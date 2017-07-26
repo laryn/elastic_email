@@ -128,38 +128,40 @@ class ElasticEmailMailSystem implements MailSystemInterface {
     }
 
     if (!isset($result['error'])) {
-      // It's necessary to urlencode() each of the data values.
-      $data = 'username=' . urlencode($elastic_username);
-      $data .= '&api_key=' . urlencode($api_key);
-      $data .= '&from=' . urlencode($from);
-      $data .= '&reply_to=' . urlencode($from);
+      $data['username'] = $elastic_username;
+      $data['api_key'] = $api_key;
+      $data['from'] = $from;
+      $data['reply_to'] = $from;
 
       if (!empty($from_name)) {
-        $data .= '&from_name=' . urlencode($from_name);
-        $data .= '&reply_to_name=' . urlencode($from_name);
+        $data['from_name'] = $from_name;
+        $data['reply_to_name'] = $from_name;
       }
 
-      $data .= '&to=' . urlencode($to);
-      $data .= '&subject=' . urlencode($subject);
+      $data['to'] = $to;
+      $data['subject'] = $subject;
 
       if (!empty($body_text)) {
-        $data .= '&body_text=' . urlencode($body_text);
+        $data['body_text'] = $body_text;
       }
       if (!empty($body_html)) {
-        $data .= '&body_html=' . urlencode($body_html);
+        $data['body_html'] = $body_html;
       }
 
       if (variable_get('elastic_email_use_default_channel', FALSE)) {
-        $data .= '&channel=' . variable_get('elastic_email_default_channel', '');
+        $data['channel'] = variable_get('elastic_email_default_channel', '');
       }
 
-      $ctx = stream_context_create(array(
-        'http' => array('method' => 'post', 'content' => $data)
+      $response = drupal_http_request(ELASTIC_EMAIL_ENDPOINT, array(
+        'method' => 'POST',
+        'data' => http_build_query($data),
+        'headers' => array(
+          'Content-Type' => 'application/x-www-form-urlencoded',
+        ),
       ));
-      $fp = @fopen(ELASTIC_EMAIL_ENDPOINT, 'rb', FALSE, $ctx);
 
       // The response should be safe, but call check_plain() for paranoia's sake.
-      $response = check_plain(@stream_get_contents($fp));
+      $response = check_plain($response->data);
 
       if (empty($response)) {
         $result['error'] = t('Error: no response (or empty response) received from Elastic Email service.');
