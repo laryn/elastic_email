@@ -2,6 +2,14 @@
 Elastic Email 8.x-x.x, xxxx-xx-xx
 ------------------------------
 
+Elastic Email 8.x-3.0, xxxx-xx-xx
+------------------------------
+
+
+Elastic Email 8.x-3.0-beta2, 2017-08-29
+------------------------------
+Issue #2841074 by ceng: Getting warning about low credit on free account
+
 
 Elastic Email 8.x-3.0-beta1, 2017-03-29
 ------------------------------
