@@ -16,6 +16,11 @@ Issue #2865181 by mike.davis: Remove the link to the settings in the error messa
 Issue #2363167 by mike.davis: set default reply to name & email
 
 
+Elastic Email 8.x-2.1, 2017-08-29
+------------------------------
+Issue #2841074 by ceng: Getting warning about low credit on free account
+
+
 Elastic Email 8.x-2.0, 2016-11-07
 ------------------------------
 Issue #2825173 by mike.davis: Settings form doesn't use $form_state to get values
