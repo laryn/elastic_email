@@ -9,7 +9,7 @@ use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Datetime\DateFormatter;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element;
+use Drupal\Core\Link;
 use Drupal\elastic_email\Service\ElasticEmailManager;
 use ElasticEmailClient\ApiException;
 
@@ -29,6 +29,10 @@ class ElasticEmailActivityLog extends FormBase {
     global $base_url;
 
     $config = \Drupal::config('elastic_email.settings');
+
+    $form['#attached'] = [
+      'library' => 'system/drupal.ajax',
+    ];
 
     $form['text'] = [
       '#markup' => $this->t('The following log information only provides data from the last 30 days. For a full report on your emails, visit the <a href="https://elasticemail.com/account">Elastic Email</a> main dashboard.')
@@ -143,18 +147,15 @@ class ElasticEmailActivityLog extends FormBase {
     $fromDate = $completeForm['search']['date_from']['#value'];
     $toDate = $completeForm['search']['date_to']['#value'];
 
-    $data = $this->getActivityDate($status, $channel, $fromDate, $toDate);
+    $data = $this->getActivityData($status, $channel, $fromDate, $toDate);
 
     $tableHeader = [
       'to',
       'status',
       'channel',
       'date time (US Format)',
-      /*'message',
-      'bounce cat.',
-      'msg-id',
-      'trans-id',*/
       'subject',
+      'view',
     ];
 
     $activityData = [];
@@ -167,6 +168,7 @@ class ElasticEmailActivityLog extends FormBase {
           $row->channel,
           $row->date,
           $row->subject,
+          $this->getViewEmailLink($row->msgid),
         ];
       }
     }
@@ -246,7 +248,7 @@ class ElasticEmailActivityLog extends FormBase {
    * @return Log | array
    *   The log data from Elastic Email.
    */
-  protected function getActivityDate($status, $channel, $fromDate, $toDate) {
+  protected function getActivityData($status, $channel, $fromDate, $toDate) {
     try {
       $fromDate = $this->formatDate($fromDate);
       $toDate = $this->formatDate($toDate);
@@ -259,6 +261,28 @@ class ElasticEmailActivityLog extends FormBase {
     catch (ApiException $e) {
       return [$e->getMessage()];
     }
+  }
+
+  /**
+   * Get the URL to view the email.
+   *
+   * @param $msgId
+   *
+   * @return \Drupal\Core\GeneratedLink
+   */
+  protected function getViewEmailLink($msgId) {
+    return Link::createFromRoute('View Email',
+        'elastic_email.view_email',
+        ['msgId' => $msgId],
+        ['attributes' =>
+          [
+            'class' => 'use-ajax',
+            'data-dialog-type' => 'modal',
+            'data-accepts' => 'application/vnd.drupal-modal',
+            'data-dialog-options' => '{"width": "80%"}'
+          ]
+        ]
+      )->toString();
   }
 
 }

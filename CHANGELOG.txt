@@ -6,6 +6,11 @@ Elastic Email 8.x-3.0, xxxx-xx-xx
 ------------------------------
 
 
+Elastic Email 8.x-3.0-beta3, 2017-08-30
+------------------------------
+Issue #2824860 by mike.davis: View email contents from the activity log
+
+
 Elastic Email 8.x-3.0-beta2, 2017-08-29
 ------------------------------
 Issue #2841074 by ceng: Getting warning about low credit on free account

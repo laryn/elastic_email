@@ -32,11 +32,22 @@ function elastic_email_help($route_name, RouteMatchInterface $route_match) {
  *  Implements hook_theme().
  */
 function elastic_email_theme() {
+  $path = drupal_get_path('module', 'elastic_email');
   return array(
     'elastic_email_dashboard' => array(
       'template' => 'elastic-email-dashboard',
       'variables' => array('data' => array()),
-      'path' => drupal_get_path('module', 'elastic_email') . '/templates',
+      'path' => $path . '/templates',
+    ),
+    'elastic_email_view_email' => array(
+      'template' => 'elastic-email-view',
+      'variables' => array('data' => array()),
+      'path' => $path . '/templates',
+    ),
+    'elastic_email_view_email_content' => array(
+      'template' => 'elastic-email-view-content',
+      'variables' => array('data' => array()),
+      'path' => $path . '/templates',
     ),
   );
 }
